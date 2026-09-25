@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Miguel Ribeiro</title>
+</head>
+<body>
+    <h1>Miguel Ribeiro</h1>
+    <p>Portfolio coming soon.</p>
+    <ul>
+        {% for project in projects %}
+<li>
+    <a href="/projects/{{ project.slug }}/">
+        {{ project.title }}
+    </a>
+</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
