@@ -31,6 +31,10 @@ ALLOWED_HOSTS = os.getenv(
     ""
 ).split(",")
 
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    ""
+).split(",")
 # Application definition
 
 INSTALLED_APPS = [
