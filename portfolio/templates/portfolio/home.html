@@ -1,16 +1,111 @@
 {% extends "portfolio/base.html" %}
 
 {% block content %}
-    <h1>Miguel Ribeiro</h1>
-    <p>Portfolio coming soon.</p>
 
-    <ul>
-        {% for project in projects %}
-            <li>
-                <a href="/projects/{{ project.slug }}/">
-                    {{ project.title }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+<section class="hero">
+    <div class="container">
+        <p class="eyebrow">Automation · Software · Cloud</p>
+
+        <h1>
+            I build practical technical solutions to real operational problems.
+        </h1>
+
+        <p class="hero-copy">
+            I moved into technology after a career in professional kitchens and now work
+            across automation, Python, data processing, web applications and cloud
+            infrastructure. This portfolio documents both what I have built and what I am
+            deliberately learning next.
+        </p>
+
+        <div class="hero-actions">
+            <a class="button button-primary" href="#projects">
+                View projects
+            </a>
+
+            <a
+                class="button button-secondary"
+                href="https://github.com/MiguelRibeiro-Cloud"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                GitHub
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="projects" class="section">
+    <div class="container">
+
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Selected work</p>
+                <h2>Projects and case studies</h2>
+            </div>
+
+            <p>
+                Evidence first: the problem, what I built, the decisions behind it,
+                and what happened afterwards.
+            </p>
+        </div>
+
+        <div class="project-grid">
+            {% for project in projects %}
+                <article class="project-card">
+
+                    <div class="project-card-top">
+                        <span class="status status-{{ project.status }}">
+                            {{ project.get_status_display }}
+                        </span>
+                    </div>
+
+                    <h3>
+                        <a href="{% url 'project_detail' project.slug %}">
+                            {{ project.title }}
+                        </a>
+                    </h3>
+
+                    <p>{{ project.summary }}</p>
+
+                    <a
+                        class="project-link"
+                        href="{% url 'project_detail' project.slug %}"
+                    >
+                        Read case study →
+                    </a>
+
+                </article>
+            {% empty %}
+                <p>No projects have been published yet.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<section class="section section-muted">
+    <div class="container split-section">
+
+        <div>
+            <p class="eyebrow">Current engineering lab</p>
+            <h2>This site is part of the project too.</h2>
+        </div>
+
+        <div class="prose">
+            <p>
+                The portfolio itself is being progressively developed from a small
+                Django and PostgreSQL application into a production-style engineering
+                environment.
+            </p>
+
+            <p>
+                Upcoming work includes automated testing, background jobs,
+                containerisation, CI/CD, cloud infrastructure, Infrastructure as Code,
+                Kubernetes and observability.
+            </p>
+        </div>
+
+    </div>
+</section>
+
 {% endblock %}

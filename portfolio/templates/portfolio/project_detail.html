@@ -1,10 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ project.title }}</title>
-</head>
-<body>
-    <h1>{{ project.title }}</h1>
-</body>
-</html>
+{% extends "portfolio/base.html" %}
+
+{% block title %}
+    {{ project.title }} | Miguel Ribeiro
+{% endblock %}
+
+{% block content %}
+
+<section class="case-study-header">
+    <div class="container case-study-header-inner">
+
+        <div>
+            <a class="back-link" href="/">← Back to projects</a>
+
+            <p class="eyebrow">Case study</p>
+
+            <h1>{{ project.title }}</h1>
+
+            <p class="case-study-summary">
+                {{ project.summary }}
+            </p>
+        </div>
+
+        <div class="case-study-meta">
+            <span class="status status-{{ project.status }}">
+                {{ project.get_status_display }}
+            </span>
+        </div>
+
+    </div>
+</section>
+
+<article class="case-study">
+    <div class="container case-study-layout">
+
+        <aside class="case-study-nav">
+            <span>Case study</span>
+
+            <a href="#problem">Problem</a>
+            <a href="#solution">Solution</a>
+            <a href="#outcome">Outcome</a>
+            <a href="#lessons">Lessons</a>
+        </aside>
+
+        <div class="case-study-content">
+
+            <section id="problem" class="case-study-section">
+                <p class="eyebrow">01</p>
+                <h2>Problem</h2>
+
+                <div class="case-study-copy">
+                    {{ project.problem|linebreaks }}
+                </div>
+            </section>
+
+            <section id="solution" class="case-study-section">
+                <p class="eyebrow">02</p>
+                <h2>Solution</h2>
+
+                <div class="case-study-copy">
+                    {{ project.solution|linebreaks }}
+                </div>
+            </section>
+
+            <section id="outcome" class="case-study-section">
+                <p class="eyebrow">03</p>
+                <h2>Outcome</h2>
+
+                <div class="case-study-copy">
+                    {{ project.outcome|linebreaks }}
+                </div>
+            </section>
+
+            <section id="lessons" class="case-study-section">
+                <p class="eyebrow">04</p>
+                <h2>Lessons and professional growth</h2>
+
+                <div class="case-study-copy">
+                    {{ project.lessons|linebreaks }}
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+</article>
+
+{% endblock %}

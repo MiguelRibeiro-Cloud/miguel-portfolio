@@ -1,19 +1,59 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{% block title %}Miguel Ribeiro{% endblock %}</title>
+
+    <meta
+        name="description"
+        content="Miguel Ribeiro — automation, software and cloud engineering portfolio."
+    >
+
+    <link rel="stylesheet" href="{% static 'portfolio/site.css' %}">
 </head>
 
 <body>
-    <header>
-        <a href="/">Miguel Ribeiro</a>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="/">Miguel Ribeiro</a>
+
+            <nav class="site-nav">
+                <a href="/">Projects</a>
+
+                <a
+                    href="https://github.com/MiguelRibeiro-Cloud"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    GitHub
+                </a>
+
+                <a
+                    href="https://www.linkedin.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    LinkedIn
+                </a>
+            </nav>
+        </div>
     </header>
 
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>
+                Built as both a professional portfolio and a hands-on engineering laboratory.
+            </p>
+        </div>
+    </footer>
 </body>
 </html>
