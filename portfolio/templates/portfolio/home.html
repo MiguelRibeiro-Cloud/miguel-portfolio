@@ -1,4 +1,5 @@
 {% extends "portfolio/base.html" %}
+{% load static %}
 
 {% block content %}
 <section class="hero" aria-labelledby="hero-title">
@@ -98,4 +99,47 @@
         </div>
     </div>
 </section>
+
+<button class="assistant-launcher" type="button" data-assistant-launcher aria-haspopup="dialog" aria-controls="assistant-panel" aria-expanded="false">
+    <span class="assistant-launcher-icon" aria-hidden="true"><img class="assistant-avatar" src="{% static 'portfolio/assistant/avatar.png' %}" alt="" width="40" height="40"></span>
+    <span>Ask about Miguel</span>
+</button>
+
+<dialog id="assistant-panel" class="assistant-drawer" data-assistant data-assistant-avatar-src="{% static 'portfolio/assistant/avatar.png' %}" aria-labelledby="assistant-title" aria-describedby="assistant-description">
+    <div class="assistant-panel-header">
+        <span class="assistant-panel-icon" aria-hidden="true"><img class="assistant-avatar" src="{% static 'portfolio/assistant/avatar.png' %}" alt="" width="32" height="32"></span>
+        <h2 id="assistant-title">Portfolio assistant</h2>
+        <button class="assistant-close" type="button" data-assistant-close aria-label="Close assistant"><span aria-hidden="true">×</span></button>
+    </div>
+    <p id="assistant-description" class="assistant-description">Ask about Miguel's work, projects, and engineering learning.</p>
+    <div class="assistant-suggestions" aria-label="Suggested questions">
+        <button type="button" class="assistant-suggestion" data-assistant-question="What automation work has Miguel done?">Automation work</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="Which projects demonstrate Python experience?">Python projects</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="What cloud experience does Miguel have?">Cloud experience</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="What is Miguel currently learning?">Current learning</button>
+    </div>
+    <ol class="assistant-conversation" data-assistant-conversation aria-label="Conversation" aria-live="polite" aria-relevant="additions text">
+        <li class="assistant-message assistant-message--assistant">
+            <span class="assistant-message-marker" aria-hidden="true"><img class="assistant-avatar" src="{% static 'portfolio/assistant/avatar.png' %}" alt="" width="32" height="32"></span>
+            <div class="assistant-message-body"><span class="visually-hidden">Assistant: </span>Hi. Ask me about Miguel's work or what he is learning.</div>
+        </li>
+    </ol>
+    <div class="assistant-compose">
+        <p class="assistant-status" data-assistant-status role="status" aria-live="polite"></p>
+        <p class="assistant-error" data-assistant-error role="alert" hidden></p>
+        <form class="assistant-form" data-assistant-form data-endpoint="{% url 'assistant_chat' %}" novalidate>
+            {% csrf_token %}
+            <label for="assistant-message">Your question</label>
+            <div class="assistant-form-row">
+                <input id="assistant-message" name="message" type="text" maxlength="1000" required autocomplete="off" placeholder="Ask about Miguel's work…">
+                <button class="button button-primary" type="submit" data-assistant-send>Send</button>
+            </div>
+        </form>
+        <p class="assistant-privacy">Messages are processed by Google Gemini. Do not submit sensitive information.</p>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'portfolio/assistant.js' %}" defer></script>
 {% endblock %}
