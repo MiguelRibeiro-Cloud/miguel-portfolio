@@ -1,88 +1,116 @@
 {% extends "portfolio/base.html" %}
+{% load static %}
 
-{% block title %}
-    {{ project.title }} | Miguel Ribeiro
-{% endblock %}
+{% block title %}{{ project.title }} | Miguel Ribeiro{% endblock %}
 
 {% block content %}
-
-<section class="case-study-header">
-    <div class="container case-study-header-inner">
-
-        <div>
-            <a class="back-link" href="/">← Back to projects</a>
-
-            <p class="eyebrow">Case study</p>
-
-            <h1>{{ project.title }}</h1>
-
-            <p class="case-study-summary">
-                {{ project.summary }}
-            </p>
+<header id="overview" class="case-study-header">
+    <div class="container">
+        <a class="back-link" href="/#projects"><span aria-hidden="true">←</span> Selected work</a>
+        <div class="case-study-heading">
+            <div>
+                <p class="eyebrow">Project / Case study</p>
+                <h1>{{ project.title }}</h1>
+            </div>
+            <div class="case-study-tags">
+                <span class="project-kind project-kind-{{ project.kind }}">{{ project.get_kind_display }} project</span>
+                <span class="status status-{{ project.status }}">{{ project.get_status_display }}</span>
+            </div>
         </div>
-
-        <div class="case-study-meta">
-            <span class="status status-{{ project.status }}">
-                {{ project.get_status_display }}
-            </span>
-        </div>
-
+        {% if project.summary %}
+            <div class="case-study-intro">
+                <p class="case-study-label">Overview</p>
+                <div class="case-study-summary">{{ project.summary|linebreaks }}</div>
+            </div>
+        {% endif %}
+        {% if project.kind == 'personal' %}
+            {% if project.live_url or project.source_url %}
+                <div class="case-study-actions">
+                    {% if project.live_url %}
+                        <a class="button button-primary" href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">Visit live project <span aria-hidden="true">↗</span></a>
+                    {% endif %}
+                    {% if project.source_url %}
+                        <a class="button button-secondary" href="{{ project.source_url }}" target="_blank" rel="noopener noreferrer">View source <span aria-hidden="true">↗</span></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
     </div>
-</section>
+</header>
 
+{% if screenshots or project.problem or project.solution or project.outcome or project.lessons %}
 <article class="case-study">
-    <div class="container case-study-layout">
-
-        <aside class="case-study-nav">
-            <span>Case study</span>
-
-            <a href="#problem">Problem</a>
-            <a href="#solution">Solution</a>
-            <a href="#outcome">Outcome</a>
-            <a href="#lessons">Lessons</a>
-        </aside>
-
+    <div class="container case-study-layout{% if screenshots %} case-study-layout--visual{% endif %}">
+        <nav class="case-study-nav" aria-label="Case study sections">
+            <span>On this page</span>
+            <a href="#overview">Overview</a>
+            {% if screenshots %}<a href="#screenshots">Screenshots</a>{% endif %}
+            {% if project.problem %}<a href="#problem">Problem</a>{% endif %}
+            {% if project.solution %}<a href="#solution">Engineering approach</a>{% endif %}
+            {% if project.outcome %}<a href="#outcome">Outcome</a>{% endif %}
+            {% if project.lessons %}<a href="#lessons">Lessons</a>{% endif %}
+        </nav>
         <div class="case-study-content">
-
-            <section id="problem" class="case-study-section">
-                <p class="eyebrow">01</p>
-                <h2>Problem</h2>
-
-                <div class="case-study-copy">
-                    {{ project.problem|linebreaks }}
-                </div>
-            </section>
-
-            <section id="solution" class="case-study-section">
-                <p class="eyebrow">02</p>
-                <h2>Solution</h2>
-
-                <div class="case-study-copy">
-                    {{ project.solution|linebreaks }}
-                </div>
-            </section>
-
-            <section id="outcome" class="case-study-section">
-                <p class="eyebrow">03</p>
-                <h2>Outcome</h2>
-
-                <div class="case-study-copy">
-                    {{ project.outcome|linebreaks }}
-                </div>
-            </section>
-
-            <section id="lessons" class="case-study-section">
-                <p class="eyebrow">04</p>
-                <h2>Lessons and professional growth</h2>
-
-                <div class="case-study-copy">
-                    {{ project.lessons|linebreaks }}
-                </div>
-            </section>
-
+            {% if screenshots %}
+                <section id="screenshots" class="case-study-section" aria-labelledby="screenshots-title">
+                    <p class="eyebrow">The application</p>
+                    <h2 id="screenshots-title">Screenshots</h2>
+                    <p class="screenshot-intro">Select an image to view it larger.</p>
+                    <div class="screenshot-grid">
+                        {% for screenshot in screenshots %}
+                            <figure class="screenshot">
+                                <a class="screenshot-link" href="{% static screenshot.image_path %}" aria-label="View larger: {% if screenshot.caption %}{{ screenshot.caption }}{% else %}Screenshot of {{ project.title }}{% endif %}">
+                                    <img src="{% static screenshot.image_path %}" alt="{% if screenshot.caption %}{{ screenshot.caption }}{% else %}Screenshot of {{ project.title }}{% endif %}" loading="lazy" decoding="async">
+                                </a>
+                                {% if screenshot.caption %}<figcaption>{{ screenshot.caption }}</figcaption>{% endif %}
+                            </figure>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            {% if project.problem %}
+                <section id="problem" class="case-study-section" aria-labelledby="problem-title">
+                    <p class="eyebrow">The need</p>
+                    <h2 id="problem-title">Problem</h2>
+                    <div class="case-study-copy">{{ project.problem|linebreaks }}</div>
+                </section>
+            {% endif %}
+            {% if project.solution %}
+                <section id="solution" class="case-study-section" aria-labelledby="solution-title">
+                    <p class="eyebrow">The build</p>
+                    <h2 id="solution-title">Engineering approach</h2>
+                    <div class="case-study-copy">{{ project.solution|linebreaks }}</div>
+                </section>
+            {% endif %}
+            {% if project.outcome %}
+                <section id="outcome" class="case-study-section" aria-labelledby="outcome-title">
+                    <p class="eyebrow">The result</p>
+                    <h2 id="outcome-title">Outcome</h2>
+                    <div class="case-study-copy">{{ project.outcome|linebreaks }}</div>
+                </section>
+            {% endif %}
+            {% if project.lessons %}
+                <section id="lessons" class="case-study-section" aria-labelledby="lessons-title">
+                    <p class="eyebrow">Looking back</p>
+                    <h2 id="lessons-title">Lessons &amp; growth</h2>
+                    <div class="case-study-copy">{{ project.lessons|linebreaks }}</div>
+                </section>
+            {% endif %}
+            <a class="back-link case-study-end-link" href="/#projects"><span aria-hidden="true">←</span> Back to selected work</a>
         </div>
-
     </div>
 </article>
-
+{% endif %}
+{% if screenshots %}
+<dialog class="screenshot-dialog" aria-label="Screenshot preview" aria-describedby="screenshot-dialog-caption">
+    <div class="screenshot-dialog-panel">
+        <form method="dialog" class="screenshot-dialog-controls">
+            <button type="submit" class="screenshot-dialog-close" aria-label="Close screenshot preview">Close <span aria-hidden="true">&times;</span></button>
+        </form>
+        <img class="screenshot-dialog-image" alt="">
+        <p id="screenshot-dialog-caption" class="screenshot-dialog-caption"></p>
+    </div>
+</dialog>
+<script src="{% static 'portfolio/screenshot-gallery.js' %}" defer></script>
+{% endif %}
 {% endblock %}

@@ -14,8 +14,13 @@ def health(request):
 
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
+    screenshots = (
+        project.screenshots.all()
+        if project.kind == Project.Kind.PERSONAL
+        else ()
+    )
     return render(
         request,
         "portfolio/project_detail.html",
-        {"project": project},
+        {"project": project, "screenshots": screenshots},
     )
