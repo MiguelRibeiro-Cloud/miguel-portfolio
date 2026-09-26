@@ -1,111 +1,101 @@
 {% extends "portfolio/base.html" %}
 
 {% block content %}
-
-<section class="hero">
-    <div class="container">
-        <p class="eyebrow">Automation · Software · Cloud</p>
-
-        <h1>
-            I build practical technical solutions to real operational problems.
-        </h1>
-
-        <p class="hero-copy">
-            I moved into technology after a career in professional kitchens and now work
-            across automation, Python, data processing, web applications and cloud
-            infrastructure. This portfolio documents both what I have built and what I am
-            deliberately learning next.
-        </p>
-
-        <div class="hero-actions">
-            <a class="button button-primary" href="#projects">
-                View projects
-            </a>
-
-            <a
-                class="button button-secondary"
-                href="https://github.com/MiguelRibeiro-Cloud"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                GitHub
-            </a>
+<section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-layout">
+        <div class="hero-main">
+            <p class="eyebrow">Miguel Ribeiro / Automation · Software · Cloud</p>
+            <h1 id="hero-title">I turn operational problems into working software.</h1>
+            <p class="hero-copy">
+                I build automation, data workflows and Python-backed applications around the way people actually work. My background in operations helps me understand the problem before choosing the technical solution.
+            </p>
+            <div class="hero-actions">
+                <a class="button button-primary" href="#projects">Explore selected work <span aria-hidden="true">↗</span></a>
+                <a class="button button-secondary" href="https://github.com/MiguelRibeiro-Cloud" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+            </div>
+        </div>
+        <div class="hero-aside">
+            <p class="eyebrow">The through line</p>
+            <p>Operational understanding.<br>Practical engineering.<br>Systems people can use.</p>
+            <span>From professional kitchens to technical operations and software.</span>
         </div>
     </div>
 </section>
 
-<section id="projects" class="section">
+<section id="projects" class="section" aria-labelledby="projects-title">
     <div class="container">
-
         <div class="section-heading">
             <div>
-                <p class="eyebrow">Selected work</p>
-                <h2>Projects and case studies</h2>
+                <p class="eyebrow">01 / Selected work</p>
+                <h2 id="projects-title">Work with a problem behind it.</h2>
             </div>
-
-            <p>
-                Evidence first: the problem, what I built, the decisions behind it,
-                and what happened afterwards.
-            </p>
+            <p>Each case study explains the context, the engineering approach and what came out of the work.</p>
         </div>
-
         <div class="project-grid">
             {% for project in projects %}
                 <article class="project-card">
-
-                    <div class="project-card-top">
-                        <span class="status status-{{ project.status }}">
-                            {{ project.get_status_display }}
-                        </span>
-                    </div>
-
-                    <h3>
-                        <a href="{% url 'project_detail' project.slug %}">
-                            {{ project.title }}
-                        </a>
-                    </h3>
-
-                    <p>{{ project.summary }}</p>
-
-                    <a
-                        class="project-link"
-                        href="{% url 'project_detail' project.slug %}"
-                    >
-                        Read case study →
+                    <a class="project-card-link" href="{% url 'project_detail' project.slug %}" aria-label="Read case study: {{ project.title }}">
+                        <div class="project-card-top">
+                            <span class="project-kind project-kind-{{ project.kind }}">{{ project.get_kind_display }} project</span>
+                            <span class="status status-{{ project.status }}">{{ project.get_status_display }}</span>
+                        </div>
+                        <h3>{{ project.title }}</h3>
+                        {% if project.summary %}<p>{{ project.summary|truncatewords:38 }}</p>{% endif %}
+                        <span class="project-link">Read case study <span aria-hidden="true">↗</span></span>
                     </a>
-
                 </article>
             {% empty %}
-                <p>No projects have been published yet.</p>
+                <p class="empty-state">Selected work will appear here once projects are published.</p>
             {% endfor %}
         </div>
-
     </div>
 </section>
 
-<section class="section section-muted">
-    <div class="container split-section">
+<section class="section section-muted" aria-labelledby="capabilities-title">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">02 / Areas of work</p>
+                <h2 id="capabilities-title">Where I apply engineering.</h2>
+            </div>
+            <p>My work connects operational needs with tools that make information easier to process, find and use.</p>
+        </div>
+        <div class="capability-grid">
+            <article class="capability">
+                <span class="capability-index">01</span>
+                <h3>Automation &amp; data</h3>
+                <p>Turning manual reporting and document workflows into repeatable Python-backed processes.</p>
+            </article>
+            <article class="capability">
+                <span class="capability-index">02</span>
+                <h3>Backend &amp; web</h3>
+                <p>Building applications that validate inputs, process data and give people useful feedback.</p>
+            </article>
+            <article class="capability">
+                <span class="capability-index">03</span>
+                <h3>Cloud &amp; deployment</h3>
+                <p>Deploying and operating personal projects while developing stronger production engineering practices.</p>
+            </article>
+            <article class="capability">
+                <span class="capability-index">04</span>
+                <h3>AI-assisted systems</h3>
+                <p>Adding conversational access to structured information when it helps people find relevant context.</p>
+            </article>
+        </div>
+    </div>
+</section>
 
+<section class="section lab-section" aria-labelledby="lab-title">
+    <div class="container lab-layout">
         <div>
-            <p class="eyebrow">Current engineering lab</p>
-            <h2>This site is part of the project too.</h2>
+            <p class="eyebrow">03 / Portfolio engineering</p>
+            <h2 id="lab-title">This site is part of the work.</h2>
         </div>
-
-        <div class="prose">
-            <p>
-                The portfolio itself is being progressively developed from a small
-                Django and PostgreSQL application into a production-style engineering
-                environment.
-            </p>
-
-            <p>
-                Upcoming work includes automated testing, background jobs,
-                containerisation, CI/CD, cloud infrastructure, Infrastructure as Code,
-                Kubernetes and observability.
-            </p>
+        <div class="lab-copy">
+            <p>I use this portfolio to develop and demonstrate production engineering skills alongside the case studies it presents.</p>
+            <p>Today it runs on Django and PostgreSQL, uses Docker for local development, has automated Django tests and GitHub Actions CI/CD, and is deployed to production.</p>
+            <a class="text-link" href="https://github.com/MiguelRibeiro-Cloud" target="_blank" rel="noopener noreferrer">Explore my GitHub <span aria-hidden="true">↗</span></a>
         </div>
-
     </div>
 </section>
-
 {% endblock %}
