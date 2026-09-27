@@ -11,6 +11,7 @@ class Project(models.Model):
         PRODUCTION = "production", "Production"
         PROTOTYPE = "prototype", "Prototype"
         LEARNING = "learning", "Learning"
+        EXPERIMENT = "experiment", "Experiment"
 
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)

@@ -12,6 +12,48 @@ from .models import Project, ProjectScreenshot
 
 
 class SeedPortfolioCommandTests(TestCase):
+    def test_seeds_the_fog_without_links_or_screenshots_and_preserves_unrelated_work(self):
+        unrelated = Project.objects.create(
+            slug="independent-project",
+            title="Independent project",
+            kind=Project.Kind.PERSONAL,
+        )
+        unrelated_screenshot = ProjectScreenshot.objects.create(
+            project=unrelated,
+            image_path="portfolio/projects/independent/overview.png",
+            caption="Independent screenshot",
+        )
+
+        call_command("seed_portfolio", stdout=StringIO())
+        fog = Project.objects.get(slug="the-fog-book-as-code")
+        self.assertEqual(fog.title, "The Fog — Book as Code")
+        self.assertEqual(fog.kind, Project.Kind.LEARNING)
+        self.assertEqual(fog.status, Project.Status.EXPERIMENT)
+        self.assertEqual(fog.live_url, "")
+        self.assertEqual(fog.source_url, "")
+        self.assertFalse(fog.screenshots.exists())
+
+        response = self.client.get(reverse("project_detail", args=[fog.slug]))
+        self.assertContains(response, "Learning project")
+        self.assertContains(response, "Experiment")
+        self.assertContains(response, "Write Chapter X. Follow the repository instructions.")
+        self.assertNotContains(response, "Visit live project")
+        self.assertNotContains(response, "View source")
+        self.assertNotContains(response, 'id="screenshots"')
+
+        project_ids = dict(Project.objects.values_list("slug", "id"))
+        call_command("seed_portfolio", stdout=StringIO())
+
+        self.assertEqual(dict(Project.objects.values_list("slug", "id")), project_ids)
+        self.assertFalse(fog.screenshots.exists())
+        self.assertTrue(Project.objects.filter(pk=unrelated.pk, title="Independent project").exists())
+        self.assertTrue(
+            ProjectScreenshot.objects.filter(
+                pk=unrelated_screenshot.pk,
+                caption="Independent screenshot",
+            ).exists()
+        )
+
     def test_seeds_the_judge_and_preserves_existing_projects_on_rerun(self):
         unrelated = Project.objects.create(
             slug="independent-project",
