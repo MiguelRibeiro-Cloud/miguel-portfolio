@@ -396,6 +396,59 @@ Do not invent:
 - commercial success
 - cost savings
 
+## Book as Code / The Fog
+
+Classification: learning / experiment
+
+The Fog is a human-directed, repository-driven AI-assisted long-form fiction experiment.
+
+The central experiment was whether a coding/writing agent could produce coherent long-form work from an extremely small per-task instruction:
+
+    Write Chapter X. Follow the repository instructions.
+
+Instead of placing story context into each prompt, durable context and operating rules were externalized into the repository.
+
+The repository separates:
+
+- Manuscript — established prose and events
+- Narrative — future story planning and routing
+- Characters — character reference
+- World — setting and world canon
+- State — compact continuity and current-state memory
+- AGENTS.md — repository-wide instructions governing retrieval, authority, drafting, revision, and state updates
+
+Agents are expected to discover the relevant context selectively, draft the chapter, preserve established continuity, and update materially affected State files.
+
+The human remains the final creative authority: chapters are reviewed, edited, redirected, or revised before acceptance.
+
+At the time the portfolio case study was created, the project contained approximately:
+
+- 29 chapters
+- 164,700 manuscript words
+- 541 numbered narrative planning beats
+- 37 world-reference files
+- 8 character-reference files
+- 10 state files
+- a substantial repository-level agent instruction specification
+
+The project demonstrates document-level context engineering, persistent project state, selective context retrieval, domain-specific authority rules, continuity management, and human review gates.
+
+It does NOT include a custom agent runtime, RAG/vector database, automated continuity validation, multi-agent orchestration, model training, or autonomous novel generation.
+
+Best public framing:
+
+“Designing a repository-resident context and continuity system for human-directed, agent-assisted long-form fiction under minimal per-chapter prompting.”
+
+The GitHub repository is private because it contains the unpublished manuscript, future narrative plans, spoilers, and worldbuilding.
+
+Public portfolio material should use only sanitized/cropped artifacts such as:
+
+- the minimal chapter prompt beside the repository structure
+- selected AGENTS.md authority/retrieval rules
+- sanitized Narrative routing/index structure
+- State category structure without story-specific contents
+
+
 # 7. Other Relevant Technical Work
 
 Miguel has also built or worked with:
