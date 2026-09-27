@@ -30,6 +30,25 @@ class PortfolioViewTests(TestCase):
 
         self.assertContains(response, "Test Project")
 
+    def test_homepage_presents_portfolio_engineering_after_selected_work(self):
+        response = self.client.get("/")
+        html = response.content.decode()
+
+        self.assertLess(html.index('id="projects"'), html.index('id="lab-title"'))
+        self.assertLess(html.index('id="lab-title"'), html.index('id="capabilities-title"'))
+        self.assertContains(response, "This portfolio is an engineering project.")
+        for implemented_detail in (
+            "Django and PostgreSQL",
+            "idempotent Django management command",
+            "Docker Compose",
+            "PostgreSQL-backed GitHub Actions CI",
+            "Railway deployment",
+            "Google Gemini assistant",
+            "credentials stay server-side",
+        ):
+            with self.subTest(implemented_detail=implemented_detail):
+                self.assertContains(response, implemented_detail)
+
     def test_homepage_card_uses_project_data_and_links_to_detail(self):
         response = self.client.get("/")
 

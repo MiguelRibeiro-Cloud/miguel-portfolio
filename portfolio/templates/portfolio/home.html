@@ -52,11 +52,38 @@
     </div>
 </section>
 
-<section class="section section-muted" aria-labelledby="capabilities-title">
+<section class="section section-muted lab-section" aria-labelledby="lab-title">
     <div class="container">
         <div class="section-heading">
             <div>
-                <p class="eyebrow">02 / Areas of work</p>
+                <p class="eyebrow">02 / Portfolio engineering</p>
+                <h2 id="lab-title">This portfolio is an engineering project.</h2>
+            </div>
+            <p>A deployed Django application, not a static résumé page. I use it to put web development, delivery and AI integration into practice.</p>
+        </div>
+        <div class="lab-grid">
+            <article class="lab-item">
+                <h3>Application</h3>
+                <p>Django and PostgreSQL power responsive project case studies. Portfolio content is version controlled and synced through an idempotent Django management command.</p>
+            </article>
+            <article class="lab-item">
+                <h3>Testing &amp; delivery</h3>
+                <p>Docker Compose runs the local app. Automated Django tests run in PostgreSQL-backed GitHub Actions CI; feature branches and pull requests lead to Railway deployment with environment-based production configuration.</p>
+            </article>
+            <article class="lab-item">
+                <h3>AI integration</h3>
+                <p>The Google Gemini assistant answers from curated portfolio context and public project records. Its credentials stay server-side.</p>
+            </article>
+        </div>
+        <a class="text-link lab-link" href="https://github.com/MiguelRibeiro-Cloud" target="_blank" rel="noopener noreferrer">Explore my GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+</section>
+
+<section class="section" aria-labelledby="capabilities-title">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">03 / Areas of work</p>
                 <h2 id="capabilities-title">Where I apply engineering.</h2>
             </div>
             <p>My work connects operational needs with tools that make information easier to process, find and use.</p>
@@ -86,42 +113,28 @@
     </div>
 </section>
 
-<section class="section lab-section" aria-labelledby="lab-title">
-    <div class="container lab-layout">
-        <div>
-            <p class="eyebrow">03 / Portfolio engineering</p>
-            <h2 id="lab-title">This site is part of the work.</h2>
-        </div>
-        <div class="lab-copy">
-            <p>I use this portfolio to develop and demonstrate production engineering skills alongside the case studies it presents.</p>
-            <p>Today it runs on Django and PostgreSQL, uses Docker for local development, has automated Django tests and GitHub Actions CI/CD, and is deployed to production.</p>
-            <a class="text-link" href="https://github.com/MiguelRibeiro-Cloud" target="_blank" rel="noopener noreferrer">Explore my GitHub <span aria-hidden="true">↗</span></a>
-        </div>
-    </div>
-</section>
-
 <button class="assistant-launcher" type="button" data-assistant-launcher aria-haspopup="dialog" aria-controls="assistant-panel" aria-expanded="false">
     <span class="assistant-launcher-icon" aria-hidden="true"><img class="assistant-avatar" src="{% static 'portfolio/assistant/avatar.png' %}" alt="" width="40" height="40"></span>
-    <span>Ask about Miguel</span>
+    <span>Ask Miguel</span>
 </button>
 
 <dialog id="assistant-panel" class="assistant-drawer" data-assistant data-assistant-avatar-src="{% static 'portfolio/assistant/avatar.png' %}" aria-labelledby="assistant-title" aria-describedby="assistant-description">
     <div class="assistant-panel-header">
         <span class="assistant-panel-icon" aria-hidden="true"><img class="assistant-avatar" src="{% static 'portfolio/assistant/avatar.png' %}" alt="" width="32" height="32"></span>
-        <h2 id="assistant-title">Portfolio assistant</h2>
+        <h2 id="assistant-title">Ask Miguel</h2>
         <button class="assistant-close" type="button" data-assistant-close aria-label="Close assistant"><span aria-hidden="true">×</span></button>
     </div>
-    <p id="assistant-description" class="assistant-description">Ask about Miguel's work, projects, and engineering learning.</p>
+    <p id="assistant-description" class="assistant-description">AI assistant grounded in Miguel's portfolio. Miguel is not replying live.</p>
     <div class="assistant-suggestions" aria-label="Suggested questions">
-        <button type="button" class="assistant-suggestion" data-assistant-question="What automation work has Miguel done?">Automation work</button>
-        <button type="button" class="assistant-suggestion" data-assistant-question="Which projects demonstrate Python experience?">Python projects</button>
-        <button type="button" class="assistant-suggestion" data-assistant-question="What cloud experience does Miguel have?">Cloud experience</button>
-        <button type="button" class="assistant-suggestion" data-assistant-question="What is Miguel currently learning?">Current learning</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="What automation work have you done?">Automation work</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="Which projects show your Python experience?">Python projects</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="What cloud experience do you have?">Cloud experience</button>
+        <button type="button" class="assistant-suggestion" data-assistant-question="What are you currently learning?">Current learning</button>
     </div>
     <ol class="assistant-conversation" data-assistant-conversation aria-label="Conversation" aria-live="polite" aria-relevant="additions text">
         <li class="assistant-message assistant-message--assistant">
             <span class="assistant-message-marker" aria-hidden="true"><img class="assistant-avatar" src="{% static 'portfolio/assistant/avatar.png' %}" alt="" width="32" height="32"></span>
-            <div class="assistant-message-body"><span class="visually-hidden">Assistant: </span>Hi. Ask me about Miguel's work or what he is learning.</div>
+            <div class="assistant-message-body"><span class="visually-hidden">Assistant: </span>Hi. I'm an AI representation of Miguel. Ask about my work, projects or what I'm learning.</div>
         </li>
     </ol>
     <div class="assistant-compose">
@@ -131,7 +144,7 @@
             {% csrf_token %}
             <label for="assistant-message">Your question</label>
             <div class="assistant-form-row">
-                <input id="assistant-message" name="message" type="text" maxlength="1000" required autocomplete="off" placeholder="Ask about Miguel's work…">
+                <input id="assistant-message" name="message" type="text" maxlength="1000" required autocomplete="off" placeholder="Ask about my work…">
                 <button class="button button-primary" type="submit" data-assistant-send>Send</button>
             </div>
         </form>
