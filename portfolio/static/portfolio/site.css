@@ -63,6 +63,7 @@ a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-
 .hero h1 { max-width: 840px; margin: 0; font-size: clamp(3rem, 5.9vw, 5.3rem); line-height: 1.04; letter-spacing: -0.055em; }
 .hero-copy { max-width: 710px; margin: 1.8rem 0 0; color: #3e5060; font-size: clamp(1.1rem, 1.5vw, 1.25rem); line-height: 1.65; }
 .hero-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 2.3rem; }
+.hero-actions > .text-link { align-self: center; }
 .hero-aside { padding: 1.35rem 0 0 1.4rem; border-left: 2px solid var(--accent); }
 .hero-aside .eyebrow { margin-bottom: 0.8rem; }
 .hero-aside > p:not(.eyebrow) { margin: 0 0 1rem; font-size: 1.12rem; font-weight: 700; line-height: 1.45; letter-spacing: -0.02em; }

@@ -10,8 +10,8 @@ PROJECTS = (
             "that evolved into Python-backed processing in an internal application."
         ),
         "problem": (
-            "Reporting depended on multiple manual deliverables and scattered data "
-            "sources. The process involved repeated work, inconsistent outputs, "
+            "Reporting depended on multiple manual deliverables and scattered source "
+            "files. The process involved repeated work, inconsistent outputs, "
             "and opportunities for input errors."
         ),
         "solution": (
@@ -49,8 +49,8 @@ PROJECTS = (
             "AI-assisted interface."
         ),
         "problem": (
-            "A pooled delivery model created a need to preserve operational "
-            "knowledge and retrieve relevant context. That information was "
+            "A shared delivery model increased the need to preserve and update "
+            "customer context. That information was "
             "spread across a large collection of Word documents."
         ),
         "solution": (
@@ -98,10 +98,10 @@ PROJECTS = (
             "privacy-conscious design throughout."
         ),
         "outcome": (
-            "The application reached a working Azure deployment, combining "
-            "location-specific reviews, interactive mapping, passwordless "
-            "authentication, SQL-backed persistence, and AI-assisted functionality "
-            "in a live full-stack application."
+            "The application is live in production on Azure. It demonstrates "
+            "end-to-end ownership of a public full-stack product, from "
+            "location-specific reviews and SQL persistence to interactive maps, "
+            "passwordless authentication, and AI functionality."
         ),
         "lessons": (
             "The project gave me end-to-end experience beyond application code: "
@@ -127,6 +127,72 @@ PROJECTS = (
                 "image_path": "portfolio/projects/livedhere/livedhere_review.png",
                 "caption": "Detailed building review showing category ratings, overall score, and written feedback.",
                 "sort_order": 3,
+            },
+        ),
+    },
+    {
+        "slug": "the-judge-aita-ai-chatbot",
+        "kind": "personal",
+        "title": "The Judge — AITA AI Chatbot",
+        "summary": (
+            "A public AI courtroom app that turns everyday disagreements into "
+            "humorous rulings, built with React, Python Azure Functions, "
+            "Google GenAI, and PostgreSQL."
+        ),
+        "problem": (
+            "Users submit disagreements and petty dilemmas for humorous courtroom "
+            "rulings. Making that simple interaction reliable in a public serverless "
+            "app meant handling variable model responses, bounded conversation "
+            "context, input validation, provider failures, shared state, and "
+            "verdicts that agree with the UI."
+        ),
+        "solution": (
+            "I built the React frontend on Azure Static Web Apps and a same-origin "
+            "Python Azure Functions backend that calls Google GenAI. Credentials "
+            "stay server-side; the backend validates input, bounds conversation "
+            "history, and handles timeouts and provider errors. PostgreSQL holds "
+            "the deployment-wide case counter outside serverless function memory.\n\n"
+            "After free-form replies proved brittle, I moved the model to structured "
+            "verdict, ruling, and consequence fields. Python validates those fields "
+            "and owns the final response structure; React derives the YTA/NTA badge "
+            "from the validated verdict. User messages are treated as case material."
+        ),
+        "outcome": (
+            "The app is live in production, turning submitted dilemmas into "
+            "conversational courtroom rulings. Its validated verdict drives the "
+            "displayed badge, and PostgreSQL keeps the case counter shared across "
+            "serverless instances."
+        ),
+        "lessons": (
+            "Free-form model output is a poor application contract; validated "
+            "fields are safer than parsing prose. External AI providers need "
+            "validation and failure handling, and user content needs a clear "
+            "boundary from system instructions. Shared serverless state belongs "
+            "in persistent storage; optional features should not block a ruling."
+        ),
+        "status": "production",
+        "live_url": "https://www.amitheassholeai.com/",
+        "source_url": "",
+        "screenshots": (
+            {
+                "image_path": "portfolio/projects/aitabot/normal.png",
+                "caption": "A completed courtroom ruling showing the conversation and YTA verdict badge.",
+                "sort_order": 1,
+            },
+            {
+                "image_path": "portfolio/projects/aitabot/main.png",
+                "caption": "The Judge's main interface with service status, case count, and conversation entry point.",
+                "sort_order": 2,
+            },
+            {
+                "image_path": "portfolio/projects/aitabot/prompt_cake_injection.png",
+                "caption": "An out-of-role cake request treated as case material and returned as a normal courtroom ruling.",
+                "sort_order": 3,
+            },
+            {
+                "image_path": "portfolio/projects/aitabot/disclaimer.png",
+                "caption": "First-use privacy and entertainment disclosure shown before entering the application.",
+                "sort_order": 4,
             },
         ),
     },
@@ -183,67 +249,5 @@ PROJECTS = (
         "live_url": "",
         "source_url": "",
         "screenshots": (),
-    },
-    {
-        "slug": "the-judge-aita-ai-chatbot",
-        "kind": "personal",
-        "title": "The Judge — AITA AI Chatbot",
-        "summary": (
-            "A playful AI courtroom chatbot built with React and Python Azure "
-            "Functions, returning structured rulings through Google GenAI."
-        ),
-        "problem": (
-            "A courtroom chatbot needs to stay in character when users submit "
-            "out-of-role requests, and its verdict must remain consistent across "
-            "the written ruling and YTA/NTA badge. Free-form model replies made "
-            "that output contract brittle."
-        ),
-        "solution": (
-            "I built a React frontend on Azure Static Web Apps with a same-origin "
-            "Python Azure Functions backend. The backend keeps Google GenAI "
-            "credentials server-side, validates input, bounds conversation context, "
-            "and handles timeouts and provider errors. User messages are treated "
-            "as case material. The model returns a structured verdict, ruling, "
-            "and consequence; Python validates the fields, and React derives "
-            "the YTA/NTA badge from the verdict. PostgreSQL stores the "
-            "deployment-wide case counter outside serverless function memory."
-        ),
-        "outcome": (
-            "The production application delivers conversational courtroom rulings "
-            "with a validated verdict and a matching badge. Its PostgreSQL-backed "
-            "case counter is shared across function instances."
-        ),
-        "lessons": (
-            "Prompt instructions alone are an unreliable output contract; "
-            "validated structured output is more robust than parsing free-form "
-            "prose. User content needs an explicit boundary from system "
-            "instructions. Serverless shared state belongs in persistent storage, "
-            "and optional features should not block the primary user path."
-        ),
-        "status": "production",
-        "live_url": "https://www.amitheassholeai.com/",
-        "source_url": "",
-        "screenshots": (
-            {
-                "image_path": "portfolio/projects/aitabot/normal.png",
-                "caption": "A completed courtroom ruling showing the conversation and YTA verdict badge.",
-                "sort_order": 1,
-            },
-            {
-                "image_path": "portfolio/projects/aitabot/main.png",
-                "caption": "The Judge's main interface with service status, case count, and conversation entry point.",
-                "sort_order": 2,
-            },
-            {
-                "image_path": "portfolio/projects/aitabot/prompt_cake_injection.png",
-                "caption": "An out-of-role cake request treated as case material and returned as a normal courtroom ruling.",
-                "sort_order": 3,
-            },
-            {
-                "image_path": "portfolio/projects/aitabot/disclaimer.png",
-                "caption": "First-use privacy and entertainment disclosure shown before entering the application.",
-                "sort_order": 4,
-            },
-        ),
     },
 )
