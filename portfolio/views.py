@@ -17,6 +17,15 @@ MAX_HISTORY_TURNS = 8
 MAX_HISTORY_CHARACTERS = 5_000
 
 
+def _page_metadata(request, title, description, og_type):
+    return {
+        "page_title": title,
+        "page_description": description,
+        "canonical_url": request.build_absolute_uri(request.path),
+        "og_type": og_type,
+    }
+
+
 def home(request):
     projects = Project.objects.annotate(
         kind_order=Case(
@@ -27,7 +36,17 @@ def home(request):
             output_field=IntegerField(),
         )
     ).order_by("kind_order", "id")
-    return render(request, "portfolio/home.html", {"projects": projects})
+    context = {
+        "projects": projects,
+        **_page_metadata(
+            request,
+            "Miguel Ribeiro | Automation, Software and Cloud",
+            "Miguel Ribeiro builds automation, data workflows and Python-backed "
+            "applications for operational problems.",
+            "website",
+        ),
+    }
+    return render(request, "portfolio/home.html", context)
 
 
 def health(request):
@@ -101,8 +120,15 @@ def project_detail(request, slug):
         if project.kind == Project.Kind.PERSONAL
         else ()
     )
-    return render(
-        request,
-        "portfolio/project_detail.html",
-        {"project": project, "screenshots": screenshots},
-    )
+    context = {
+        "project": project,
+        "screenshots": screenshots,
+        **_page_metadata(
+            request,
+            f"{project.title} | Miguel Ribeiro",
+            project.summary.strip()
+            or f"Case study of {project.title} by Miguel Ribeiro.",
+            "article",
+        ),
+    }
+    return render(request, "portfolio/project_detail.html", context)

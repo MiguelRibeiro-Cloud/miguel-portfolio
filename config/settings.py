@@ -26,6 +26,11 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
+# Railway terminates public HTTPS and forwards the original request scheme.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") if not DEBUG else None
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 ALLOWED_HOSTS = os.getenv(
     "DJANGO_ALLOWED_HOSTS",
     ""
