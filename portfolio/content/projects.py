@@ -130,4 +130,66 @@ PROJECTS = (
             },
         ),
     },
+    {
+        "slug": "the-judge-aita-ai-chatbot",
+        "kind": "personal",
+        "title": "The Judge — AITA AI Chatbot",
+        "summary": (
+            "A playful AI courtroom chatbot built with React and Python Azure "
+            "Functions, returning structured rulings through Google GenAI."
+        ),
+        "problem": (
+            "A courtroom chatbot needs to stay in character when users submit "
+            "out-of-role requests, and its verdict must remain consistent across "
+            "the written ruling and YTA/NTA badge. Free-form model replies made "
+            "that output contract brittle."
+        ),
+        "solution": (
+            "I built a React frontend on Azure Static Web Apps with a same-origin "
+            "Python Azure Functions backend. The backend keeps Google GenAI "
+            "credentials server-side, validates input, bounds conversation context, "
+            "and handles timeouts and provider errors. User messages are treated "
+            "as case material. The model returns a structured verdict, ruling, "
+            "and consequence; Python validates the fields, and React derives "
+            "the YTA/NTA badge from the verdict. PostgreSQL stores the "
+            "deployment-wide case counter outside serverless function memory."
+        ),
+        "outcome": (
+            "The production application delivers conversational courtroom rulings "
+            "with a validated verdict and a matching badge. Its PostgreSQL-backed "
+            "case counter is shared across function instances."
+        ),
+        "lessons": (
+            "Prompt instructions alone are an unreliable output contract; "
+            "validated structured output is more robust than parsing free-form "
+            "prose. User content needs an explicit boundary from system "
+            "instructions. Serverless shared state belongs in persistent storage, "
+            "and optional features should not block the primary user path."
+        ),
+        "status": "production",
+        "live_url": "https://www.amitheassholeai.com/",
+        "source_url": "",
+        "screenshots": (
+            {
+                "image_path": "portfolio/projects/aitabot/normal.png",
+                "caption": "A completed courtroom ruling showing the conversation and YTA verdict badge.",
+                "sort_order": 1,
+            },
+            {
+                "image_path": "portfolio/projects/aitabot/main.png",
+                "caption": "The Judge's main interface with service status, case count, and conversation entry point.",
+                "sort_order": 2,
+            },
+            {
+                "image_path": "portfolio/projects/aitabot/prompt_cake_injection.png",
+                "caption": "An out-of-role cake request treated as case material and returned as a normal courtroom ruling.",
+                "sort_order": 3,
+            },
+            {
+                "image_path": "portfolio/projects/aitabot/disclaimer.png",
+                "caption": "First-use privacy and entertainment disclosure shown before entering the application.",
+                "sort_order": 4,
+            },
+        ),
+    },
 )

@@ -12,6 +12,61 @@ from .models import Project, ProjectScreenshot
 
 
 class SeedPortfolioCommandTests(TestCase):
+    def test_seeds_the_judge_and_preserves_existing_projects_on_rerun(self):
+        unrelated = Project.objects.create(
+            slug="independent-project",
+            title="Independent project",
+            kind=Project.Kind.PERSONAL,
+        )
+        unrelated_screenshot = ProjectScreenshot.objects.create(
+            project=unrelated,
+            image_path="portfolio/projects/independent/overview.png",
+            caption="Independent screenshot",
+        )
+
+        call_command("seed_portfolio", stdout=StringIO())
+        judge = Project.objects.get(slug="the-judge-aita-ai-chatbot")
+        self.assertEqual(judge.title, "The Judge — AITA AI Chatbot")
+        self.assertEqual(judge.kind, Project.Kind.PERSONAL)
+        self.assertEqual(judge.status, Project.Status.PRODUCTION)
+        self.assertEqual(judge.live_url, "https://www.amitheassholeai.com/")
+        self.assertEqual(judge.source_url, "")
+
+        screenshots = list(judge.screenshots.values_list("image_path", "caption", "sort_order"))
+        self.assertEqual(len(screenshots), 4)
+        self.assertEqual([order for _, _, order in screenshots], [1, 2, 3, 4])
+        self.assertEqual(
+            [path for path, _, _ in screenshots],
+            [
+                "portfolio/projects/aitabot/normal.png",
+                "portfolio/projects/aitabot/main.png",
+                "portfolio/projects/aitabot/prompt_cake_injection.png",
+                "portfolio/projects/aitabot/disclaimer.png",
+            ],
+        )
+        self.assertIn("case material", screenshots[2][1])
+        for path, caption, _ in screenshots:
+            self.assertIsNotNone(finders.find(path))
+            self.assertTrue(caption)
+        response = self.client.get(reverse("project_detail", args=[judge.slug]))
+        self.assertContains(response, 'href="https://www.amitheassholeai.com/"')
+        self.assertNotContains(response, "View source")
+
+        project_ids = dict(Project.objects.values_list("slug", "id"))
+        screenshot_ids = list(judge.screenshots.values_list("id", flat=True))
+        call_command("seed_portfolio", stdout=StringIO())
+
+        self.assertEqual(dict(Project.objects.values_list("slug", "id")), project_ids)
+        self.assertEqual(list(judge.screenshots.values_list("id", flat=True)), screenshot_ids)
+        self.assertEqual(judge.screenshots.count(), 4)
+        self.assertTrue(Project.objects.filter(pk=unrelated.pk, title="Independent project").exists())
+        self.assertTrue(
+            ProjectScreenshot.objects.filter(
+                pk=unrelated_screenshot.pk,
+                caption="Independent screenshot",
+            ).exists()
+        )
+
     def test_creates_projects_with_complete_case_study_content(self):
         output = StringIO()
 

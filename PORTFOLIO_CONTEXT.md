@@ -262,6 +262,139 @@ Do not invent:
 unless explicitly added later.
 
 ---
+# Personal Project: The Judge / AITA AI Chatbot
+
+The Judge is a personal production project.
+
+Live application:
+
+https://www.amitheassholeai.com/
+
+The project is intentionally playful: users submit disagreements, petty dilemmas, or similar situations and receive a humorous courtroom-style guilty/not-guilty ruling.
+
+## Current production architecture
+
+Browser
+→ React frontend
+→ Azure Static Web Apps
+→ same-origin Python Azure Functions
+→ Google GenAI
+→ PostgreSQL for deployment-wide shared state
+
+## Verified technologies
+
+- React
+- JavaScript
+- Python
+- Azure Functions
+- Azure Static Web Apps
+- Google GenAI
+- PostgreSQL
+- GitHub Actions
+- server-side environment configuration
+
+## Implemented engineering characteristics
+
+The application includes:
+
+- conversational AI interaction
+- bounded short-session conversation history
+- server-side LLM credentials
+- input validation
+- timeout and provider-error handling
+- retry and cancellation UX
+- copy / clear / transcript-export controls
+- responsive UI
+- privacy and terms disclosures
+- restricted Markdown rendering
+- production security headers
+- automated Python tests
+- PostgreSQL-backed deployment-wide case counter
+
+Conversations are not intentionally persisted as server-side chat transcripts.
+
+The global case counter is stored outside ephemeral serverless function instances.
+
+## LLM output handling
+
+Earlier versions relied more heavily on free-form model output and defensive text cleanup.
+
+This proved brittle when adversarial or out-of-role user messages caused the model to expose drafting or instruction-related commentary.
+
+The current implementation uses structured model output with three validated fields:
+
+- verdict: `guilty` or `not_guilty`
+- ruling
+- consequence
+
+Python owns the final response structure rather than relying on the model to format the public reply correctly.
+
+The frontend derives the displayed YTA/NTA badge directly from the validated structured verdict.
+
+User-submitted messages are explicitly treated as case material rather than model instructions.
+
+Requests such as:
+- recipe requests
+- role-change attempts
+- system-prompt requests
+
+are treated as material for the Judge to rule on rather than instructions to follow.
+
+Do not describe this as complete protection against all prompt injection. It is a deliberately stronger trust boundary and structured-output approach.
+
+## Streaming clarification
+
+The application uses an SSE-compatible response path, but the current backend buffers the provider response before returning the final result.
+
+Do not describe the current implementation as true token-by-token or real-time streaming.
+
+## Public portfolio presentation
+
+Classification:
+
+- kind: personal
+- status: production
+
+Live URL:
+
+https://www.amitheassholeai.com/
+
+Do not add a public source/GitHub link yet.
+
+The repository has been cleaned enough for internal confidence, but source-code presentation is intentionally deferred.
+
+Approved portfolio screenshots:
+
+1. Normal completed ruling
+2. Main / landing state
+3. Prompt-injection / cake request handled as case material
+4. Privacy / disclaimer view
+
+The normal ruling should be the primary screenshot.
+
+## Public positioning
+
+The project is useful portfolio evidence because it demonstrates:
+
+- React application development
+- Python serverless APIs
+- LLM integration
+- structured model output
+- prompt-boundary design
+- defensive validation
+- external API failure handling
+- shared state in serverless systems
+- PostgreSQL integration
+- Azure deployment
+- practical iteration after real model-output failure modes
+
+Do not invent:
+- user counts
+- traffic
+- adoption
+- uptime
+- commercial success
+- cost savings
 
 # 7. Other Relevant Technical Work
 
