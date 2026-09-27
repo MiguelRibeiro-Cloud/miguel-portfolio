@@ -6,17 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{% block title %}Miguel Ribeiro{% endblock %}</title>
+    <title>{{ page_title }}</title>
 
-    <meta
-        name="description"
-        content="Miguel Ribeiro — automation, software and cloud engineering portfolio."
-    >
+    <meta name="description" content="{{ page_description }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:title" content="{{ page_title }}">
+    <meta property="og:description" content="{{ page_description }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:type" content="{{ og_type }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ page_title }}">
+    <meta name="twitter:description" content="{{ page_description }}">
 
     <link rel="stylesheet" href="{% static 'portfolio/site.css' %}">
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="site-header">
         <div class="container header-inner">
             <a class="brand" href="/">Miguel Ribeiro</a>
@@ -45,7 +51,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
         {% block content %}
         {% endblock %}
     </main>

@@ -1,9 +1,40 @@
+import os
+import runpy
+from unittest.mock import patch
+
+from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.templatetags.static import static
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from .models import Project, ProjectScreenshot
+
+
+class SecuritySettingsTests(SimpleTestCase):
+    def settings_for(self, debug):
+        with patch.dict(os.environ, {"DJANGO_DEBUG": debug}):
+            return runpy.run_path(str(settings.BASE_DIR / "config" / "settings.py"))
+
+    def test_production_uses_railway_https_header_and_secure_cookies(self):
+        production = self.settings_for("False")
+
+        self.assertFalse(production["DEBUG"])
+        self.assertEqual(
+            production["SECURE_PROXY_SSL_HEADER"],
+            ("HTTP_X_FORWARDED_PROTO", "https"),
+        )
+        self.assertTrue(production["SESSION_COOKIE_SECURE"])
+        self.assertTrue(production["CSRF_COOKIE_SECURE"])
+        self.assertFalse(production.get("SECURE_SSL_REDIRECT", False))
+
+    def test_local_http_development_keeps_cookies_usable(self):
+        development = self.settings_for("True")
+
+        self.assertTrue(development["DEBUG"])
+        self.assertIsNone(development["SECURE_PROXY_SSL_HEADER"])
+        self.assertFalse(development["SESSION_COOKIE_SECURE"])
+        self.assertFalse(development["CSRF_COOKIE_SECURE"])
 
 
 class HealthViewTests(TestCase):
@@ -26,6 +57,92 @@ class PortfolioViewTests(TestCase):
         response = self.client.get("/")
 
         self.assertEqual(response.status_code, 200)
+
+    @override_settings(
+        ALLOWED_HOSTS=["portfolio.example"],
+        SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"),
+    )
+    def test_homepage_metadata_uses_forwarded_https_and_omits_query_string(self):
+        response = self.client.get(
+            "/?from=linkedin",
+            HTTP_HOST="portfolio.example",
+            HTTP_X_FORWARDED_PROTO="https",
+        )
+        html = response.content.decode()
+        title = "Miguel Ribeiro | Automation, Software and Cloud"
+        description = (
+            "Miguel Ribeiro builds automation, data workflows and Python-backed "
+            "applications for operational problems."
+        )
+        canonical = "https://portfolio.example/"
+
+        self.assertTrue(response.wsgi_request.is_secure())
+        self.assertInHTML(f"<title>{title}</title>", html)
+        self.assertInHTML(f'<meta name="description" content="{description}">', html)
+        self.assertInHTML(f'<link rel="canonical" href="{canonical}">', html)
+        for property_name, value in (
+            ("og:title", title),
+            ("og:description", description),
+            ("og:url", canonical),
+            ("og:type", "website"),
+        ):
+            self.assertInHTML(
+                f'<meta property="{property_name}" content="{value}">', html
+            )
+        self.assertInHTML('<meta name="twitter:card" content="summary">', html)
+        self.assertInHTML(f'<meta name="twitter:title" content="{title}">', html)
+        self.assertInHTML(
+            f'<meta name="twitter:description" content="{description}">', html
+        )
+
+    @override_settings(
+        ALLOWED_HOSTS=["portfolio.example"],
+        SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"),
+    )
+    def test_project_metadata_uses_its_own_summary_and_canonical_url(self):
+        path = reverse("project_detail", args=[self.project.slug])
+        response = self.client.get(
+            f"{path}?from=linkedin",
+            HTTP_HOST="portfolio.example",
+            HTTP_X_FORWARDED_PROTO="https",
+        )
+        html = response.content.decode()
+        title = "Test Project | Miguel Ribeiro"
+        canonical = f"https://portfolio.example{path}"
+
+        self.assertInHTML(f"<title>{title}</title>", html)
+        self.assertInHTML(
+            f'<meta name="description" content="{self.project.summary}">', html
+        )
+        self.assertInHTML(f'<link rel="canonical" href="{canonical}">', html)
+        for property_name, value in (
+            ("og:title", title),
+            ("og:description", self.project.summary),
+            ("og:url", canonical),
+            ("og:type", "article"),
+        ):
+            self.assertInHTML(
+                f'<meta property="{property_name}" content="{value}">', html
+            )
+        self.assertInHTML('<meta name="twitter:card" content="summary">', html)
+        self.assertInHTML(f'<meta name="twitter:title" content="{title}">', html)
+        self.assertInHTML(
+            f'<meta name="twitter:description" content="{self.project.summary}">',
+            html,
+        )
+
+    def test_skip_link_precedes_navigation_and_targets_main_content(self):
+        for path in ("/", reverse("project_detail", args=[self.project.slug])):
+            with self.subTest(path=path):
+                html = self.client.get(path).content.decode()
+                self.assertInHTML(
+                    '<a class="skip-link" href="#main-content">Skip to main content</a>',
+                    html,
+                )
+                self.assertIn('<main id="main-content" tabindex="-1">', html)
+                self.assertLess(
+                    html.index('class="skip-link"'), html.index('class="brand"')
+                )
 
     def test_homepage_shows_project(self):
         response = self.client.get("/")
