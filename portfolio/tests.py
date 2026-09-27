@@ -1,3 +1,5 @@
+from django.contrib.staticfiles import finders
+from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 
@@ -29,6 +31,20 @@ class PortfolioViewTests(TestCase):
         response = self.client.get("/")
 
         self.assertContains(response, "Test Project")
+
+    def test_cv_download_links_point_to_public_pdf(self):
+        cv_path = "portfolio/files/miguel-ribeiro-cv.pdf"
+        self.assertIsNotNone(finders.find(cv_path))
+
+        cv_link = f'href="{static(cv_path)}" download>Download CV</a>'
+        home = self.client.get("/")
+        detail = self.client.get(reverse("project_detail", args=[self.project.slug]))
+
+        self.assertEqual(home.content.decode().count(cv_link), 2)
+        self.assertContains(detail, cv_link)
+        self.assertContains(home, 'href="#projects">View Projects')
+        self.assertContains(home, 'href="https://github.com/MiguelRibeiro-Cloud"')
+        self.assertContains(home, 'href="https://www.linkedin.com/in/miguel-js-ribeiro/"')
 
     def test_homepage_presents_portfolio_engineering_after_selected_work(self):
         response = self.client.get("/")

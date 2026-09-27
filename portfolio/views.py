@@ -1,6 +1,7 @@
 import json
 
 from django.core.exceptions import RequestDataTooBig
+from django.db.models import Case, IntegerField, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
@@ -17,7 +18,15 @@ MAX_HISTORY_CHARACTERS = 5_000
 
 
 def home(request):
-    projects = Project.objects.all()
+    projects = Project.objects.annotate(
+        kind_order=Case(
+            When(kind=Project.Kind.PROFESSIONAL, then=Value(0)),
+            When(kind=Project.Kind.PERSONAL, then=Value(1)),
+            When(kind=Project.Kind.LEARNING, then=Value(2)),
+            default=Value(3),
+            output_field=IntegerField(),
+        )
+    ).order_by("kind_order", "id")
     return render(request, "portfolio/home.html", {"projects": projects})
 
 

@@ -12,6 +12,40 @@ from .models import Project, ProjectScreenshot
 
 
 class SeedPortfolioCommandTests(TestCase):
+    def test_homepage_orders_personal_production_before_learning_after_reseeding(self):
+        fog = Project.objects.create(
+            slug="the-fog-book-as-code",
+            title="Previous Fog title",
+            kind=Project.Kind.LEARNING,
+            status=Project.Status.EXPERIMENT,
+        )
+        call_command("seed_portfolio", stdout=StringIO())
+        judge = Project.objects.get(slug="the-judge-aita-ai-chatbot")
+        self.assertLess(fog.pk, judge.pk)
+
+        response = self.client.get("/")
+        self.assertEqual(
+            list(response.context["projects"].values_list("slug", flat=True)),
+            [
+                "standardized-reporting-workflow",
+                "customer-context-knowledge-capture-tool",
+                "livedhere-pt",
+                "the-judge-aita-ai-chatbot",
+                "the-fog-book-as-code",
+            ],
+        )
+        html = response.content.decode()
+        self.assertLess(html.index(judge.title), html.index("The Fog — Book as Code"))
+        fog.refresh_from_db()
+        self.assertEqual(
+            (judge.kind, judge.status),
+            (Project.Kind.PERSONAL, Project.Status.PRODUCTION),
+        )
+        self.assertEqual(
+            (fog.kind, fog.status),
+            (Project.Kind.LEARNING, Project.Status.EXPERIMENT),
+        )
+
     def test_seeds_the_fog_without_links_or_screenshots_and_preserves_unrelated_work(self):
         unrelated = Project.objects.create(
             slug="independent-project",

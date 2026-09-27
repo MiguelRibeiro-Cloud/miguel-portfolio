@@ -131,60 +131,6 @@ PROJECTS = (
         ),
     },
     {
-        "slug": "the-fog-book-as-code",
-        "kind": "learning",
-        "title": "The Fog — Book as Code",
-        "summary": (
-            "A human-directed, repository-driven AI-assisted long-form fiction experiment. "
-            "Manuscript, plans, continuity state, and agent instructions live together "
-            "so a chapter can begin from a minimal task prompt."
-        ),
-        "problem": (
-            "Long-running AI-assisted writing can depend on chat history or large "
-            "manually assembled prompts. I tested whether durable repository context "
-            "could support continuity across a large manuscript while leaving "
-            "creative decisions with a human."
-        ),
-        "solution": (
-            "I separated Manuscript (established prose and events), Narrative (future "
-            "plans and beats), Characters (reference), World (canon and knowledge "
-            "boundaries), and State (compact current continuity). AGENTS.md defines "
-            "retrieval, domain-specific authority, drafting, revision, review, and "
-            "State maintenance. A chapter begins with: \"Write Chapter X. Follow the "
-            "repository instructions.\" The agent retrieves relevant context selectively "
-            "instead of loading everything.\n\n"
-            "The instructions distinguish established facts, future plans, reference "
-            "canon, and derived State. State serves as constraint memory, including "
-            "current continuity and reveal boundaries, rather than creative source "
-            "material. The agent updates materially affected State after drafting. "
-            "Major contradictions and consequential new canon require human review; "
-            "I review, edit, redirect, reject, or request revisions before accepting "
-            "chapters."
-        ),
-        "outcome": (
-            "At the time of this case study, the repository held approximately "
-            "29 manuscript chapters, 164,700 manuscript words, 541 numbered "
-            "narrative planning beats, 37 world-reference files, 8 character-reference "
-            "files, 10 State files, and a substantial repository-level agent "
-            "instruction specification. The long-running project was maintained "
-            "with repository-contained context and relatively little dependence "
-            "on individual chat sessions."
-        ),
-        "lessons": (
-            "Durable context can live outside chat history. Different kinds of "
-            "information need distinct sources of authority and selective retrieval. "
-            "Context also needs structure and lifecycle rules: State summaries help "
-            "with continuity but can drift unless maintained. Human judgment remains "
-            "necessary for creative direction and genuine ambiguity, while "
-            "natural-language agent instructions remain probabilistic rather than "
-            "enforced."
-        ),
-        "status": "experiment",
-        "live_url": "",
-        "source_url": "",
-        "screenshots": (),
-    },
-    {
         "slug": "the-judge-aita-ai-chatbot",
         "kind": "personal",
         "title": "The Judge — AITA AI Chatbot",
@@ -245,5 +191,59 @@ PROJECTS = (
                 "sort_order": 4,
             },
         ),
+    },
+    {
+        "slug": "the-fog-book-as-code",
+        "kind": "learning",
+        "title": "The Fog — Book as Code",
+        "summary": (
+            "A human-directed, repository-driven AI-assisted long-form fiction experiment. "
+            "Manuscript, plans, continuity state, and agent instructions live together "
+            "so a chapter can begin from a minimal task prompt."
+        ),
+        "problem": (
+            "Long-running AI-assisted writing can depend on chat history or large "
+            "manually assembled prompts. I tested whether durable repository context "
+            "could support continuity across a large manuscript while leaving "
+            "creative decisions with a human."
+        ),
+        "solution": (
+            "I separated Manuscript (established prose and events), Narrative (future "
+            "plans and beats), Characters (reference), World (canon and knowledge "
+            "boundaries), and State (compact current continuity). AGENTS.md defines "
+            "retrieval, domain-specific authority, drafting, revision, review, and "
+            "State maintenance. A chapter begins with: \"Write Chapter X. Follow the "
+            "repository instructions.\" The agent retrieves relevant context selectively "
+            "instead of loading everything.\n\n"
+            "The instructions distinguish established facts, future plans, reference "
+            "canon, and derived State. State serves as constraint memory, including "
+            "current continuity and reveal boundaries, rather than creative source "
+            "material. The agent updates materially affected State after drafting. "
+            "Major contradictions and consequential new canon require human review; "
+            "I review, edit, redirect, reject, or request revisions before accepting "
+            "chapters."
+        ),
+        "outcome": (
+            "At the time of this case study, the repository held approximately "
+            "29 manuscript chapters, 164,700 manuscript words, 541 numbered "
+            "narrative planning beats, 37 world-reference files, 8 character-reference "
+            "files, 10 State files, and a substantial repository-level agent "
+            "instruction specification. The long-running project was maintained "
+            "with repository-contained context and relatively little dependence "
+            "on individual chat sessions."
+        ),
+        "lessons": (
+            "Durable context can live outside chat history. Different kinds of "
+            "information need distinct sources of authority and selective retrieval. "
+            "Context also needs structure and lifecycle rules: State summaries help "
+            "with continuity but can drift unless maintained. Human judgment remains "
+            "necessary for creative direction and genuine ambiguity, while "
+            "natural-language agent instructions remain probabilistic rather than "
+            "enforced."
+        ),
+        "status": "experiment",
+        "live_url": "",
+        "source_url": "",
+        "screenshots": (),
     },
 )
