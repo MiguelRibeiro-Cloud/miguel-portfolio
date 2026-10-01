@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 import os
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +46,28 @@ CSRF_TRUSTED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+
+_public_site_url = os.getenv("PUBLIC_SITE_URL", "").strip().rstrip("/")
+if _public_site_url:
+    _public_site_parts = urlsplit(_public_site_url)
+    try:
+        _public_site_parts.port
+    except ValueError as exc:
+        raise ImproperlyConfigured("PUBLIC_SITE_URL has an invalid port.") from exc
+    if (
+        _public_site_parts.scheme not in ("http", "https")
+        or not _public_site_parts.hostname
+        or _public_site_parts.username is not None
+        or _public_site_parts.password is not None
+        or _public_site_parts.path
+        or _public_site_parts.query
+        or _public_site_parts.fragment
+    ):
+        raise ImproperlyConfigured("PUBLIC_SITE_URL must be an HTTP(S) site origin.")
+    PUBLIC_SITE_URL = f"{_public_site_parts.scheme}://{_public_site_parts.netloc}"
+else:
+    PUBLIC_SITE_URL = ""
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,6 +82,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'portfolio.middleware.CanonicalHostMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

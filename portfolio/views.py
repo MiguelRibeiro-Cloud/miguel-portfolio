@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
+from .canonical import canonical_url
 from .models import Project
 from .services.assistant import answer
 from .services.google_ai import AssistantConfigurationError, AssistantProviderError
@@ -21,7 +22,7 @@ def _page_metadata(request, title, description, og_type):
     return {
         "page_title": title,
         "page_description": description,
-        "canonical_url": request.build_absolute_uri(request.path),
+        "canonical_url": canonical_url(request),
         "og_type": og_type,
     }
 

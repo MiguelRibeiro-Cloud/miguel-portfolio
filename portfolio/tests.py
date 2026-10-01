@@ -12,9 +12,17 @@ from .models import Project, ProjectScreenshot
 
 
 class SecuritySettingsTests(SimpleTestCase):
-    def settings_for(self, debug):
-        with patch.dict(os.environ, {"DJANGO_DEBUG": debug}):
+    def settings_for(self, debug, public_site_url=""):
+        with patch.dict(
+            os.environ,
+            {"DJANGO_DEBUG": debug, "PUBLIC_SITE_URL": public_site_url},
+        ):
             return runpy.run_path(str(settings.BASE_DIR / "config" / "settings.py"))
+
+    def test_public_site_url_is_optional_and_normalized_to_an_origin(self):
+        self.assertEqual(self.settings_for("True")["PUBLIC_SITE_URL"], "")
+        configured = self.settings_for("False", "  https://public.example///  ")
+        self.assertEqual(configured["PUBLIC_SITE_URL"], "https://public.example")
 
     def test_production_uses_railway_https_header_and_secure_cookies(self):
         production = self.settings_for("False")
@@ -60,6 +68,7 @@ class PortfolioViewTests(TestCase):
 
     @override_settings(
         ALLOWED_HOSTS=["portfolio.example"],
+        PUBLIC_SITE_URL="",
         SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"),
     )
     def test_homepage_metadata_uses_forwarded_https_and_omits_query_string(self):
@@ -97,6 +106,7 @@ class PortfolioViewTests(TestCase):
 
     @override_settings(
         ALLOWED_HOSTS=["portfolio.example"],
+        PUBLIC_SITE_URL="",
         SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"),
     )
     def test_project_metadata_uses_its_own_summary_and_canonical_url(self):
@@ -320,3 +330,97 @@ class PortfolioViewTests(TestCase):
         response = self.client.get("/projects/does-not-exist/")
 
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(
+    ALLOWED_HOSTS=["public.example", "alternate.example"],
+    PUBLIC_SITE_URL="https://public.example",
+)
+class CanonicalSiteTests(TestCase):
+    def setUp(self):
+        self.project = Project.objects.create(
+            title="Test Project",
+            slug="test-project",
+            summary="A project created for automated testing.",
+        )
+
+    def test_canonical_host_serves_homepage_with_public_metadata(self):
+        response = self.client.get("/?utm_source=test", HTTP_HOST="public.example")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertInHTML(
+            '<link rel="canonical" href="https://public.example/">', html
+        )
+        self.assertInHTML(
+            '<meta property="og:url" content="https://public.example/">', html
+        )
+
+    def test_other_allowed_host_redirects_permanently_with_path_and_query(self):
+        path = reverse("project_detail", args=[self.project.slug])
+        response = self.client.get(
+            f"{path}?utm_source=test&ref=portfolio",
+            HTTP_HOST="alternate.example",
+        )
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(
+            response.headers["Location"],
+            f"https://public.example{path}?utm_source=test&ref=portfolio",
+        )
+
+    def test_head_redirects_to_public_host(self):
+        response = self.client.head("/", HTTP_HOST="alternate.example")
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.headers["Location"], "https://public.example/")
+
+    def test_project_metadata_uses_public_origin_without_query(self):
+        path = reverse("project_detail", args=[self.project.slug])
+        response = self.client.get(
+            f"{path}?utm_source=test", HTTP_HOST="public.example"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertInHTML(
+            f'<link rel="canonical" href="https://public.example{path}">', html
+        )
+        self.assertInHTML(
+            f'<meta property="og:url" content="https://public.example{path}">',
+            html,
+        )
+
+    def test_health_keeps_its_response_on_other_host(self):
+        response = self.client.get("/health/", HTTP_HOST="alternate.example")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "ok"})
+
+    def test_post_on_other_host_is_not_redirected(self):
+        response = self.client.post(
+            reverse("assistant_chat"),
+            data="{}",
+            content_type="text/plain",
+            HTTP_HOST="alternate.example",
+        )
+
+        self.assertEqual(response.status_code, 415)
+        self.assertNotIn("Location", response.headers)
+
+    @override_settings(PUBLIC_SITE_URL="")
+    def test_unconfigured_site_uses_incoming_host_without_redirect(self):
+        response = self.client.get(
+            "/?utm_source=test",
+            HTTP_HOST="alternate.example",
+            secure=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertInHTML(
+            '<link rel="canonical" href="https://alternate.example/">', html
+        )
+        self.assertInHTML(
+            '<meta property="og:url" content="https://alternate.example/">', html
+        )

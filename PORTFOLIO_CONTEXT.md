@@ -562,6 +562,8 @@ The portfolio currently uses:
 - Pull Requests
 - CI-gated deployment
 - Railway production deployment
+- canonical public portfolio URL: https://miguelribeiro.dev
+- production canonical-host behavior derived from `PUBLIC_SITE_URL`
 - production Docker builds
 - pre-deployment Django migrations
 - public health endpoint
