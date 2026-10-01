@@ -157,11 +157,38 @@ class PortfolioViewTests(TestCase):
         home = self.client.get("/")
         detail = self.client.get(reverse("project_detail", args=[self.project.slug]))
 
-        self.assertEqual(home.content.decode().count(cv_link), 2)
+        self.assertEqual(home.content.decode().count(cv_link), 3)
         self.assertContains(detail, cv_link)
         self.assertContains(home, 'href="#projects">View Projects')
         self.assertContains(home, 'href="https://github.com/MiguelRibeiro-Cloud"')
         self.assertContains(home, 'href="https://www.linkedin.com/in/miguel-js-ribeiro/"')
+
+    def test_homepage_about_and_contact_follow_areas_of_work(self):
+        response = self.client.get("/")
+        html = response.content.decode()
+
+        self.assertLess(html.index('id="capabilities-title"'), html.index('id="about-title"'))
+        self.assertLess(html.index('id="about-title"'), html.index('id="contact-title"'))
+        self.assertLess(html.index('id="contact-title"'), html.index('class="site-footer"'))
+        for text in (
+            "04 / About",
+            "professional kitchens",
+            "Cisco Asset Management",
+            "networking and cybersecurity training",
+            "05 / Contact",
+            "Connect on LinkedIn",
+        ):
+            with self.subTest(text=text):
+                self.assertContains(response, text)
+        self.assertContains(
+            response,
+            'class="button button-primary" href="https://www.linkedin.com/in/miguel-js-ribeiro/"',
+        )
+        self.assertContains(
+            response,
+            'class="button button-secondary" '
+            f'href="{static("portfolio/files/miguel-ribeiro-cv.pdf")}" download',
+        )
 
     def test_homepage_presents_portfolio_engineering_after_selected_work(self):
         response = self.client.get("/")
