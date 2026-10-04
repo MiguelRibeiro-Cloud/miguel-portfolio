@@ -1,0 +1,172 @@
+{% extends "portfolio/base.html" %}
+
+{% block content %}
+<header id="overview" class="case-study-header flagship-header">
+    <div class="container">
+        <a class="back-link" href="/#projects"><span aria-hidden="true">←</span> Selected work</a>
+        <div class="flagship-hero">
+            <div class="flagship-hero-copy">
+                <p class="eyebrow">Featured project / {{ flagship.kicker }}</p>
+                <h1>{{ project.title }}</h1>
+                <p>{{ flagship.hero }}</p>
+                <div class="case-study-actions">
+                    <a class="button button-primary" href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">Live demo <span aria-hidden="true">↗</span></a>
+                    <a class="button button-secondary" href="{{ project.source_url }}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+                    <a class="text-link flagship-architecture-link" href="#architecture">Architecture / How it works <span aria-hidden="true">↓</span></a>
+                </div>
+            </div>
+            <aside class="flagship-hero-meta" aria-label="Project details">
+                <div><span>Status</span><strong>{{ project.get_status_display }}</strong></div>
+                <div><span>Focus</span><strong>Evidence-aware AI</strong></div>
+                <div><span>Live</span><a href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">{{ flagship.domain }}</a></div>
+            </aside>
+        </div>
+    </div>
+</header>
+
+<article class="case-study flagship-case-study">
+    <div class="container flagship-layout">
+        <nav class="case-study-nav flagship-nav" aria-label="Case study sections">
+            <span>On this page</span>
+            <a href="#problem">Problem</a>
+            <a href="#build">What I built</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#decisions">Not just a chatbot</a>
+            <a href="#discovery-example">Discovery example</a>
+            <a href="#orchestration">Orchestration</a>
+            <a href="#visuals">Visual evidence</a>
+            <a href="#evaluation">AI evaluation</a>
+            <a href="#hardening">Public-demo hardening</a>
+            <a href="#stack">Stack &amp; role</a>
+        </nav>
+
+        <div class="case-study-content flagship-content">
+            <section id="problem" class="case-study-section flagship-opening" aria-labelledby="problem-title">
+                <p class="eyebrow">The problem</p>
+                <h2 id="problem-title">Automation needs a reliable picture of the work.</h2>
+                <div class="case-study-copy">
+                    {% for paragraph in flagship.problem_paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+                </div>
+                <p class="investigates-first">The agent investigates first.</p>
+            </section>
+
+            <section id="build" class="case-study-section" aria-labelledby="build-title">
+                <p class="eyebrow">What I built</p>
+                <h2 id="build-title">Discovery, structured state, then a verified proposal.</h2>
+                <div class="case-study-copy">
+                    {% for paragraph in flagship.build_paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+                </div>
+            </section>
+
+            <section id="architecture" class="case-study-section architecture-section" aria-labelledby="architecture-title">
+                <p class="eyebrow">Architecture</p>
+                <h2 id="architecture-title">The application owns the system boundaries.</h2>
+                <div class="architecture-diagram" role="img" aria-label="Browser connects to FastAPI. FastAPI coordinates a GPT discovery agent, an MCP client for CRM and pricing, RAG over company documents, application-owned ProcessState, and an explicit Process Analyst, Automation Designer, Evidence Verifier pipeline.">
+                    <div class="architecture-entry">
+                        {% for item in flagship.architecture.application %}<span>{{ item }}</span>{% if not forloop.last %}<i aria-hidden="true">↓</i>{% endif %}{% endfor %}
+                    </div>
+                    <div class="architecture-core">Application control plane</div>
+                    <div class="architecture-branches">
+                        {% for branch in flagship.architecture.branches %}
+                        <div class="architecture-node">
+                            <strong>{{ branch.title }}</strong>
+                            <span>{{ branch.detail }}</span>
+                            <small>{{ branch.note }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="architecture-pipeline">
+                        <span>Explicit orchestration</span>
+                        <ol>{% for stage in flagship.architecture.orchestration %}<li>{{ stage }}</li>{% endfor %}</ol>
+                    </div>
+                </div>
+                <p class="architecture-caption">{{ flagship.architecture.caption }}</p>
+            </section>
+
+            <section id="decisions" class="case-study-section" aria-labelledby="decisions-title">
+                <p class="eyebrow">Why it is not just a chatbot</p>
+                <h2 id="decisions-title">The model participates. The application stays in control.</h2>
+                <div class="decision-grid">
+                    {% for decision in flagship.engineering_decisions %}
+                    <article><span>0{{ forloop.counter }}</span><h3>{{ decision.title }}</h3><p>{{ decision.copy }}</p></article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="discovery-example" class="case-study-section" aria-labelledby="example-title">
+                <p class="eyebrow">Discovery example</p>
+                <h2 id="example-title">Preserve the conflict. Do not smooth it away.</h2>
+                <p class="synthetic-notice"><strong>Demo boundary:</strong> {{ flagship.discovery_example.company_note }}</p>
+                <div class="evidence-comparison">
+                    {% for claim in flagship.discovery_example.claims %}
+                    <blockquote><span>{{ claim.label }}</span><p>“{{ claim.quote }}”</p></blockquote>
+                    {% endfor %}
+                </div>
+                <div class="conflict-result"><span>Unresolved conflict</span><p>{{ flagship.discovery_example.result }}</p></div>
+            </section>
+
+            <section id="orchestration" class="case-study-section" aria-labelledby="orchestration-title">
+                <p class="eyebrow">Application-controlled orchestration</p>
+                <h2 id="orchestration-title">Analyze. Design. Challenge.</h2>
+                <ol class="orchestration-list">
+                    {% for stage in flagship.orchestration %}
+                    <li><span>0{{ forloop.counter }}</span><div><h3>{{ stage.title }}</h3><p>{{ stage.copy }}</p></div></li>
+                    {% endfor %}
+                </ol>
+            </section>
+
+            <section id="visuals" class="case-study-section" aria-labelledby="visuals-title">
+                <p class="eyebrow">Visual evidence</p>
+                <h2 id="visuals-title">Screenshot slots prepared.</h2>
+                <p class="screenshot-intro">The portfolio does not yet contain approved screenshots for this project. These slots document the required real assets without presenting fabricated UI.</p>
+                <div class="flagship-visual-grid">
+                    {% for visual in flagship.visual_placeholders %}
+                    <figure class="visual-placeholder">
+                        <div><span>Real screenshot pending</span><strong>{{ visual.title }}</strong><small>{{ visual.filename }}</small></div>
+                        <figcaption>{{ visual.description }}</figcaption>
+                    </figure>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="evaluation" class="case-study-section" aria-labelledby="evaluation-title">
+                <p class="eyebrow">Behavioral evaluation</p>
+                <h2 id="evaluation-title">Tests for code. Evals for intended behavior.</h2>
+                <p class="section-lead">{{ flagship.evaluation.intro }}</p>
+                <div class="evaluation-layout">
+                    <div><h3>Hybrid strategy</h3><ul class="check-list">{% for item in flagship.evaluation.strategy %}<li>{{ item }}</li>{% endfor %}</ul></div>
+                    <aside class="evaluation-snapshot"><span>Release snapshot</span><strong>35 / 37</strong><p>{{ flagship.evaluation.release }}</p></aside>
+                </div>
+                <ul class="metric-strip" aria-label="Selected evaluation results">{% for signal in flagship.evaluation.signals %}<li>{{ signal }}</li>{% endfor %}</ul>
+            </section>
+
+            <section id="hardening" class="case-study-section" aria-labelledby="hardening-title">
+                <p class="eyebrow">Public-demo hardening</p>
+                <h2 id="hardening-title">Designed for a public AI surface.</h2>
+                <ul class="hardening-grid">{% for item in flagship.hardening %}<li>{{ item }}</li>{% endfor %}</ul>
+                <div class="deployment-note"><h3>Deployment boundary</h3><p>{{ flagship.deployment }}</p></div>
+            </section>
+
+            <section id="stack" class="case-study-section" aria-labelledby="stack-title">
+                <p class="eyebrow">Technical stack &amp; contribution</p>
+                <h2 id="stack-title">Engineering ownership, with AI-native implementation.</h2>
+                <p class="role-statement">{{ flagship.role }}</p>
+                <dl class="stack-list">
+                    {% for group in flagship.stack %}<div><dt>{{ group.label }}</dt><dd>{{ group.items }}</dd></div>{% endfor %}
+                </dl>
+                <div class="judgment-panel"><h3>Engineering judgment</h3><ul class="check-list">{% for item in flagship.judgment %}<li>{{ item }}</li>{% endfor %}</ul></div>
+            </section>
+
+            <section class="flagship-cta" aria-labelledby="cta-title">
+                <p class="eyebrow">Explore the system</p>
+                <h2 id="cta-title">See the discovery flow or inspect the implementation.</h2>
+                <div class="case-study-actions">
+                    <a class="button button-primary" href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">Open live demo <span aria-hidden="true">↗</span></a>
+                    <a class="button button-secondary" href="{{ project.source_url }}" target="_blank" rel="noopener noreferrer">View GitHub <span aria-hidden="true">↗</span></a>
+                </div>
+            </section>
+            <a class="back-link case-study-end-link" href="/#projects"><span aria-hidden="true">←</span> Back to selected work</a>
+        </div>
+    </div>
+</article>
+{% endblock %}

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from .canonical import canonical_url
+from .content.sme_process_agent import CASE_STUDY, SLUG as FLAGSHIP_SLUG
 from .models import Project
 from .services.assistant import answer
 from .services.google_ai import AssistantConfigurationError, AssistantProviderError
@@ -29,6 +30,11 @@ def _page_metadata(request, title, description, og_type):
 
 def home(request):
     projects = Project.objects.annotate(
+        flagship_order=Case(
+            When(slug=FLAGSHIP_SLUG, then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField(),
+        ),
         kind_order=Case(
             When(kind=Project.Kind.PROFESSIONAL, then=Value(0)),
             When(kind=Project.Kind.PERSONAL, then=Value(1)),
@@ -36,9 +42,11 @@ def home(request):
             default=Value(3),
             output_field=IntegerField(),
         )
-    ).order_by("kind_order", "id")
+    ).order_by("flagship_order", "kind_order", "id")
     context = {
         "projects": projects,
+        "flagship_slug": FLAGSHIP_SLUG,
+        "flagship": CASE_STUDY,
         **_page_metadata(
             request,
             "Miguel Ribeiro | Automation, Software and Cloud",
@@ -116,6 +124,7 @@ def assistant_chat(request):
 
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
+    is_flagship = project.slug == FLAGSHIP_SLUG
     screenshots = (
         project.screenshots.all()
         if project.kind == Project.Kind.PERSONAL
@@ -124,12 +133,22 @@ def project_detail(request, slug):
     context = {
         "project": project,
         "screenshots": screenshots,
+        "flagship": CASE_STUDY if is_flagship else None,
         **_page_metadata(
             request,
             f"{project.title} | Miguel Ribeiro",
-            project.summary.strip()
-            or f"Case study of {project.title} by Miguel Ribeiro.",
+            (
+                CASE_STUDY["meta_description"]
+                if is_flagship
+                else project.summary.strip()
+                or f"Case study of {project.title} by Miguel Ribeiro."
+            ),
             "article",
         ),
     }
-    return render(request, "portfolio/project_detail.html", context)
+    template = (
+        "portfolio/project_detail_flagship.html"
+        if is_flagship
+        else "portfolio/project_detail.html"
+    )
+    return render(request, template, context)
