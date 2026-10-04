@@ -4,15 +4,17 @@ from unittest.mock import patch
 from django.contrib.staticfiles import finders
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .content.projects import PROJECTS
 from .models import Project, ProjectScreenshot
 
+PROJECT_BY_SLUG = {project["slug"]: project for project in PROJECTS}
+
 
 class SeedPortfolioCommandTests(TestCase):
-    def test_homepage_orders_personal_production_before_learning_after_reseeding(self):
+    def test_homepage_orders_flagship_first_and_learning_last_after_reseeding(self):
         fog = Project.objects.create(
             slug="the-fog-book-as-code",
             title="Previous Fog title",
@@ -27,6 +29,7 @@ class SeedPortfolioCommandTests(TestCase):
         self.assertEqual(
             list(response.context["projects"].values_list("slug", flat=True)),
             [
+                "sme-process-discovery-agent",
                 "standardized-reporting-workflow",
                 "customer-context-knowledge-capture-tool",
                 "livedhere-pt",
@@ -35,6 +38,8 @@ class SeedPortfolioCommandTests(TestCase):
             ],
         )
         html = response.content.decode()
+        self.assertLess(html.index("SME Process Discovery Agent"), html.index("Standardized Reporting Workflow"))
+        self.assertLess(html.index("SME Process Discovery Agent"), html.index("livedhere.pt"))
         self.assertLess(html.index(judge.title), html.index("The Fog — Book as Code"))
         fog.refresh_from_db()
         self.assertEqual(
@@ -44,6 +49,92 @@ class SeedPortfolioCommandTests(TestCase):
         self.assertEqual(
             (fog.kind, fog.status),
             (Project.Kind.LEARNING, Project.Status.EXPERIMENT),
+        )
+
+    def test_flagship_homepage_card_has_primary_actions_and_technical_signals(self):
+        call_command("seed_portfolio", stdout=StringIO())
+        project = Project.objects.get(slug="sme-process-discovery-agent")
+
+        response = self.client.get("/")
+        html = response.content.decode()
+
+        self.assertEqual(project.kind, Project.Kind.PERSONAL)
+        self.assertEqual(project.status, Project.Status.PRODUCTION)
+        self.assertContains(response, 'class="project-card project-card--flagship"')
+        self.assertContains(response, "Featured project")
+        self.assertContains(response, project.summary)
+        self.assertContains(
+            response,
+            'href="https://process-agent.miguelribeiro.dev" target="_blank" rel="noopener noreferrer"',
+        )
+        self.assertContains(
+            response,
+            'href="https://github.com/MiguelRibeiro-Cloud/sme-process-agent" target="_blank" rel="noopener noreferrer"',
+        )
+        self.assertContains(
+            response,
+            f'href="{reverse("project_detail", args=[project.slug])}">View case study',
+        )
+        for signal in ("Python", "FastAPI", "GPT", "MCP", "RAG", "AI Evals"):
+            with self.subTest(signal=signal):
+                self.assertContains(response, signal)
+        self.assertLess(html.index(project.title), html.index("livedhere.pt"))
+
+    @override_settings(
+        ALLOWED_HOSTS=["portfolio.example"],
+        PUBLIC_SITE_URL="https://portfolio.example",
+    )
+    def test_flagship_case_study_route_metadata_and_engineering_story(self):
+        call_command("seed_portfolio", stdout=StringIO())
+        project = Project.objects.get(slug="sme-process-discovery-agent")
+        path = reverse("project_detail", args=[project.slug])
+
+        response = self.client.get(path, HTTP_HOST="portfolio.example")
+        html = response.content.decode()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "portfolio/project_detail_flagship.html")
+        self.assertInHTML(
+            "<title>SME Process Discovery Agent | Miguel Ribeiro</title>", html
+        )
+        self.assertInHTML(
+            '<meta name="description" content="Evidence-aware AI process discovery using MCP, RAG, structured state, explicit orchestration, and behavioral evaluation.">',
+            html,
+        )
+        self.assertInHTML(
+            f'<link rel="canonical" href="https://portfolio.example{path}">', html
+        )
+        for text in (
+            "The agent investigates first.",
+            "Application-owned state",
+            "Evidence provenance",
+            "MCP handles operational capabilities.",
+            "ProcessState",
+            "Process Analyst",
+            "Automation Designer",
+            "Evidence Verifier",
+            "35/37 behavioral criteria",
+            "Public-demo hardening",
+            "Northstar Industrial Services is a fictional demo company using synthetic data.",
+            "using AI coding agents heavily for implementation",
+        ):
+            with self.subTest(text=text):
+                self.assertContains(response, text)
+        self.assertContains(response, 'class="architecture-diagram" role="img"')
+        self.assertContains(response, 'class="flagship-visual-grid"')
+        for filename in (
+            "sme-process-agent-discovery.png",
+            "sme-process-agent-process-model.png",
+            "sme-process-agent-orchestration.png",
+        ):
+            self.assertContains(response, filename)
+        self.assertContains(
+            response,
+            'href="https://process-agent.miguelribeiro.dev" target="_blank" rel="noopener noreferrer"',
+        )
+        self.assertContains(
+            response,
+            'href="https://github.com/MiguelRibeiro-Cloud/sme-process-agent" target="_blank" rel="noopener noreferrer"',
         )
 
     def test_seeds_the_fog_without_links_or_screenshots_and_preserves_unrelated_work(self):
@@ -175,7 +266,10 @@ class SeedPortfolioCommandTests(TestCase):
         livedhere = Project.objects.get(slug="livedhere-pt")
         self.assertEqual(
             list(livedhere.screenshots.values_list("image_path", flat=True)),
-            [screenshot["image_path"] for screenshot in PROJECTS[2]["screenshots"]],
+            [
+                screenshot["image_path"]
+                for screenshot in PROJECT_BY_SLUG["livedhere-pt"]["screenshots"]
+            ],
         )
         self.assertEqual(
             Project.objects.get(slug="standardized-reporting-workflow").kind,
@@ -206,7 +300,10 @@ class SeedPortfolioCommandTests(TestCase):
         self.assertContains(response, 'class="screenshot-dialog"')
         self.assertContains(response, 'screenshot-gallery.js')
         content = response.content.decode()
-        paths = [screenshot["image_path"] for screenshot in PROJECTS[2]["screenshots"]]
+        paths = [
+            screenshot["image_path"]
+            for screenshot in PROJECT_BY_SLUG["livedhere-pt"]["screenshots"]
+        ]
         self.assertEqual(content.count('class="screenshot-link"'), len(paths))
         self.assertTrue(
             content.index(paths[0]) < content.index(paths[1]) < content.index(paths[2])
@@ -249,7 +346,7 @@ class SeedPortfolioCommandTests(TestCase):
 
     def test_screenshots_are_synchronized_without_duplicates(self):
         definition = {
-            **PROJECTS[2],
+            **PROJECT_BY_SLUG["livedhere-pt"],
             "screenshots": (
                 {
                     "image_path": "portfolio/projects/livedhere/overview.png",
@@ -308,7 +405,7 @@ class SeedPortfolioCommandTests(TestCase):
 
     def test_professional_projects_cannot_seed_screenshots(self):
         definition = {
-            **PROJECTS[0],
+            **PROJECT_BY_SLUG["standardized-reporting-workflow"],
             "screenshots": ({"image_path": "portfolio/projects/private.png"},),
         }
 
