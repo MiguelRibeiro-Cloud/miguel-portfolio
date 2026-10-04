@@ -233,7 +233,105 @@ Do not expose:
 
 ---
 
-# 6. Personal Project: livedhere.pt
+# 6. Personal Projects
+
+## SME Process Discovery Agent
+
+The SME Process Discovery Agent is a personal production project and the strongest
+current public example of Miguel's AI-system engineering work.
+
+Live application:
+
+https://process-agent.miguelribeiro.dev
+
+Public repository:
+
+https://github.com/MiguelRibeiro-Cloud/sme-process-agent
+
+### Purpose
+
+The application is an evidence-aware AI process-discovery system. It:
+
+- interviews users about business processes
+- investigates connected operational systems through MCP
+- retrieves relevant internal documentation through RAG
+- builds an explicit, application-owned AS-IS process model
+- preserves evidence provenance, uncertainty, branches, and conflicting claims
+- produces an automation proposal through an explicit Analyst → Designer → Verifier pipeline
+
+It should not be presented as merely a chatbot.
+
+### Verified architecture and engineering characteristics
+
+- Python, FastAPI, and Pydantic backend
+- OpenAI Responses API
+- GPT-6 Luna
+- text-embedding-3-small
+- tool calling
+- MCP integration through an application-controlled client
+- semantic document retrieval through RAG
+- typed structured model output proposed as ProcessState patches
+- Python validation and application ownership of ProcessState
+- branch-aware process modeling
+- evidence provenance and policy/practice conflict preservation
+- application-controlled Process Analyst → Automation Designer → Evidence Verifier orchestration
+- deterministic validation and integration tests
+- scenario-based AI behavioral evaluations
+- semantic LLM judging only where meaning requires interpretation
+- SSE activity based on real backend events rather than fabricated model thinking
+- HTML, CSS, and JavaScript frontend
+- Docker deployment on Railway with a custom domain
+
+MCP handles operational capabilities. RAG handles semantic company knowledge. The
+application owns state and orchestration. Do not imply that the model communicates
+with MCP directly.
+
+### Evaluation snapshot
+
+The final release evaluation snapshot passed:
+
+- 9 of 11 scenario runs
+- 35 of 37 behavioral criteria
+- capability routing: 11/11
+- RAG grounding: 4/4
+- conflict preservation: 3/3
+- verifier calibration: 2/2
+
+These figures are regression signals, not a claim that the AI is "91% accurate."
+Failures remain visible rather than being hidden behind a vanity score.
+
+### Public-demo hardening and deployment boundary
+
+Implemented public-demo controls include:
+
+- anonymous cookie-backed session isolation
+- per-session ProcessState and conversation context
+- rate and lifetime request limits
+- a global model-operation emergency fuse
+- a restricted MCP subprocess environment
+- safe Markdown and DOM rendering
+- non-root Docker runtime
+- secure production cookies
+- health checks
+- an explicit synthetic RAG release artifact
+
+Describe these as public-demo hardening, not enterprise security.
+
+The Railway deployment deliberately runs one application worker because session
+state is currently in memory. Horizontal scaling would require shared state such as
+Redis or a database. Redis is not currently implemented in this project.
+
+### Demo data and contribution
+
+Northstar Industrial Services is a fictional demo company using synthetic data. Do
+not imply that Northstar is a real company or customer.
+
+Miguel designed the system architecture, product behavior, trust boundaries, state
+model, evaluation strategy, technical direction, and deployment approach. He used
+AI coding agents heavily for implementation. Do not imply that he manually typed
+every line of code, and do not frame AI-assisted implementation defensively.
+
+## livedhere.pt
 
 livedhere.pt is a personal project created after a poor rental experience.
 
@@ -562,6 +660,8 @@ The portfolio currently uses:
 - Pull Requests
 - CI-gated deployment
 - Railway production deployment
+- canonical public portfolio URL: https://miguelribeiro.dev
+- production canonical-host behavior derived from `PUBLIC_SITE_URL`
 - production Docker builds
 - pre-deployment Django migrations
 - public health endpoint
