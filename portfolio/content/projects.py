@@ -1,9 +1,11 @@
 """Public case-study content synchronized by the seed_portfolio command."""
 
+from .ai_incident_pipeline import PROJECT as AI_INCIDENT_PIPELINE
 from .sme_process_agent import PROJECT as SME_PROCESS_AGENT
 
 PROJECTS = (
     SME_PROCESS_AGENT,
+    AI_INCIDENT_PIPELINE,
     {
         "slug": "standardized-reporting-workflow",
         "kind": "professional",

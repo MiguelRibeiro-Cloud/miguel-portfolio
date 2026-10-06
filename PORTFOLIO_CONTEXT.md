@@ -331,6 +331,70 @@ model, evaluation strategy, technical direction, and deployment approach. He use
 AI coding agents heavily for implementation. Do not imply that he manually typed
 every line of code, and do not frame AI-assisted implementation defensively.
 
+## AI Incident Processing Pipeline
+
+The AI Incident Processing Pipeline is a completed personal production project and
+a strong portfolio example of distributed asynchronous processing. It should appear
+immediately after the SME Process Discovery Agent in portfolio prominence, without
+replacing it as the primary personal engineering project.
+
+Live application:
+
+https://incident.miguelribeiro.dev
+
+Public repository:
+
+https://github.com/MiguelRibeiro-Cloud/ai-incident-pipeline
+
+### Purpose
+
+The project demonstrates reliable background execution for long-running AI workloads.
+Its main engineering signal is the Celery and distributed-systems architecture rather
+than incident analysis alone.
+
+### Verified architecture
+
+- React, TypeScript, Vite, and TanStack Query frontend
+- Cloudflare Workers static-assets deployment
+- FastAPI backend
+- Celery 5.6 workers
+- Redis as Celery broker and temporary result backend for chord coordination
+- PostgreSQL as the durable source of truth
+- SQLAlchemy, Alembic, and Pydantic
+- Railway API, worker, Redis, and PostgreSQL services
+- Docker
+- Gemini 3.5 Flash Lite called by Celery workers
+- standard JSON Schema structured output with Pydantic validation
+- deliberate separation of observed evidence and AI inference
+
+FastAPI creates a durable job in PostgreSQL. Deterministic preprocessing runs as a
+Celery chain, service analyses fan out dynamically through a Celery group, and a
+Celery chord waits for every branch before final Gemini synthesis. The final result
+and execution history remain durable in PostgreSQL.
+
+### Reliability and observability
+
+- retries only for transient provider and network failures
+- bounded retries with exponential backoff and jitter
+- late acknowledgements and reject-on-worker-lost behavior
+- worker prefetch multiplier of one
+- worker-loss redelivery
+- at-least-once-style execution semantics
+- idempotent service-analysis persistence
+- terminal-state guards
+- durable execution event history
+
+The frontend exposes normalization, summarization, parallel service branches, chord
+coordination, retries, and final synthesis rather than hiding execution behind a
+spinner.
+
+The deterministic chaos demo injects two temporary checkout-api failures before
+Gemini is called. Attempts one and two fail and retry; attempt three succeeds; the
+chord then releases final synthesis.
+
+Do not describe the project as exactly-once processing, enterprise-grade,
+production-certified, or guaranteed to be completely reliable.
+
 ## livedhere.pt
 
 livedhere.pt is a personal project created after a poor rental experience.

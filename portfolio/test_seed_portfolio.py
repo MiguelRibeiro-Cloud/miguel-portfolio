@@ -30,6 +30,7 @@ class SeedPortfolioCommandTests(TestCase):
             list(response.context["projects"].values_list("slug", flat=True)),
             [
                 "sme-process-discovery-agent",
+                "ai-incident-processing-pipeline",
                 "standardized-reporting-workflow",
                 "customer-context-knowledge-capture-tool",
                 "livedhere-pt",
@@ -79,6 +80,86 @@ class SeedPortfolioCommandTests(TestCase):
             with self.subTest(signal=signal):
                 self.assertContains(response, signal)
         self.assertLess(html.index(project.title), html.index("livedhere.pt"))
+
+    @override_settings(
+        ALLOWED_HOSTS=["portfolio.example"],
+        PUBLIC_SITE_URL="https://portfolio.example",
+    )
+    def test_incident_pipeline_is_second_with_public_actions_and_case_study(self):
+        call_command("seed_portfolio", stdout=StringIO())
+        project = Project.objects.get(slug="ai-incident-processing-pipeline")
+
+        home = self.client.get("/", HTTP_HOST="portfolio.example")
+        html = home.content.decode()
+        self.assertEqual(project.kind, Project.Kind.PERSONAL)
+        self.assertEqual(project.status, Project.Status.PRODUCTION)
+        self.assertContains(home, 'class="project-card project-card--spotlight"')
+        self.assertLess(
+            html.index("SME Process Discovery Agent"),
+            html.index(project.title),
+        )
+        self.assertLess(
+            html.index(project.title),
+            html.index("Standardized Reporting Workflow"),
+        )
+        for tag in ("Celery", "FastAPI", "Redis", "PostgreSQL", "Python", "TypeScript"):
+            with self.subTest(tag=tag):
+                self.assertContains(home, tag)
+        self.assertContains(
+            home,
+            'href="https://incident.miguelribeiro.dev" target="_blank" rel="noopener noreferrer"',
+        )
+        self.assertContains(
+            home,
+            'href="https://github.com/MiguelRibeiro-Cloud/ai-incident-pipeline" target="_blank" rel="noopener noreferrer"',
+        )
+
+        path = reverse("project_detail", args=[project.slug])
+        detail = self.client.get(path, HTTP_HOST="portfolio.example")
+        detail_html = detail.content.decode()
+        self.assertTemplateUsed(detail, "portfolio/project_detail_incident.html")
+        self.assertInHTML(
+            "<title>AI Incident Processing Pipeline | Miguel Ribeiro</title>",
+            detail_html,
+        )
+        self.assertInHTML(
+            f'<link rel="canonical" href="https://portfolio.example{path}">',
+            detail_html,
+        )
+        for text in (
+            "Long-running AI work needs a different execution model.",
+            "PostgreSQL is the durable source of truth.",
+            "Selective retries",
+            "at-least-once-style execution",
+            "Follow the work, not just a spinner.",
+            "Deterministic chaos path",
+            "A schema at the model boundary.",
+            "Observed evidence",
+            "AI inference",
+            "Cloudflare Workers",
+            "Celery 5.6",
+        ):
+            with self.subTest(text=text):
+                self.assertContains(detail, text)
+        self.assertContains(detail, "not exactly-once processing")
+        self.assertContains(detail, 'class="screenshot-dialog"')
+        self.assertContains(detail, "screenshot-gallery.js")
+
+        screenshots = list(
+            project.screenshots.values_list("image_path", "caption", "sort_order")
+        )
+        self.assertEqual([order for _, _, order in screenshots], [1, 2, 3])
+        self.assertEqual(
+            [path for path, _, _ in screenshots],
+            [
+                "portfolio/projects/ai-incident-pipeline/chaos-retries.png",
+                "portfolio/projects/ai-incident-pipeline/completed-workflow.png",
+                "portfolio/projects/ai-incident-pipeline/final-report.png",
+            ],
+        )
+        for screenshot_path, caption, _ in screenshots:
+            self.assertIsNotNone(finders.find(screenshot_path))
+            self.assertTrue(caption)
 
     @override_settings(
         ALLOWED_HOSTS=["portfolio.example"],

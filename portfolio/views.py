@@ -7,6 +7,10 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from .canonical import canonical_url
+from .content.ai_incident_pipeline import (
+    CASE_STUDY as INCIDENT_CASE_STUDY,
+    SLUG as INCIDENT_SLUG,
+)
 from .content.sme_process_agent import CASE_STUDY, SLUG as FLAGSHIP_SLUG
 from .models import Project
 from .services.assistant import answer
@@ -30,9 +34,10 @@ def _page_metadata(request, title, description, og_type):
 
 def home(request):
     projects = Project.objects.annotate(
-        flagship_order=Case(
+        featured_order=Case(
             When(slug=FLAGSHIP_SLUG, then=Value(0)),
-            default=Value(1),
+            When(slug=INCIDENT_SLUG, then=Value(1)),
+            default=Value(2),
             output_field=IntegerField(),
         ),
         kind_order=Case(
@@ -42,11 +47,13 @@ def home(request):
             default=Value(3),
             output_field=IntegerField(),
         )
-    ).order_by("flagship_order", "kind_order", "id")
+    ).order_by("featured_order", "kind_order", "id")
     context = {
         "projects": projects,
         "flagship_slug": FLAGSHIP_SLUG,
         "flagship": CASE_STUDY,
+        "incident_slug": INCIDENT_SLUG,
+        "incident": INCIDENT_CASE_STUDY,
         **_page_metadata(
             request,
             "Miguel Ribeiro | Automation, Software and Cloud",
@@ -125,6 +132,7 @@ def assistant_chat(request):
 def project_detail(request, slug):
     project = get_object_or_404(Project, slug=slug)
     is_flagship = project.slug == FLAGSHIP_SLUG
+    is_incident = project.slug == INCIDENT_SLUG
     screenshots = (
         project.screenshots.all()
         if project.kind == Project.Kind.PERSONAL
@@ -134,21 +142,25 @@ def project_detail(request, slug):
         "project": project,
         "screenshots": screenshots,
         "flagship": CASE_STUDY if is_flagship else None,
+        "incident": INCIDENT_CASE_STUDY if is_incident else None,
         **_page_metadata(
             request,
             f"{project.title} | Miguel Ribeiro",
             (
                 CASE_STUDY["meta_description"]
                 if is_flagship
+                else INCIDENT_CASE_STUDY["meta_description"]
+                if is_incident
                 else project.summary.strip()
                 or f"Case study of {project.title} by Miguel Ribeiro."
             ),
             "article",
         ),
     }
-    template = (
-        "portfolio/project_detail_flagship.html"
-        if is_flagship
-        else "portfolio/project_detail.html"
-    )
+    if is_flagship:
+        template = "portfolio/project_detail_flagship.html"
+    elif is_incident:
+        template = "portfolio/project_detail_incident.html"
+    else:
+        template = "portfolio/project_detail.html"
     return render(request, template, context)

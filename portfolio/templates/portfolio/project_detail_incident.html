@@ -1,0 +1,157 @@
+{% extends "portfolio/base.html" %}
+{% load static %}
+
+{% block content %}
+<header id="overview" class="case-study-header incident-header">
+    <div class="container">
+        <a class="back-link" href="/#projects"><span aria-hidden="true">←</span> Selected work</a>
+        <div class="case-study-heading">
+            <div>
+                <p class="eyebrow">Project / {{ incident.kicker }}</p>
+                <h1>{{ project.title }}</h1>
+            </div>
+            <div class="case-study-tags">
+                <span class="project-kind project-kind-{{ project.kind }}">{{ project.get_kind_display }} project</span>
+                <span class="status status-{{ project.status }}">{{ project.get_status_display }}</span>
+            </div>
+        </div>
+        <div class="case-study-intro">
+            <p class="case-study-label">Overview</p>
+            <div class="case-study-summary">{{ project.summary|linebreaks }}</div>
+        </div>
+        <ul class="technology-tags incident-hero-tags" aria-label="Key technologies">
+            {% for tag in incident.card_tags %}<li>{{ tag }}</li>{% endfor %}
+        </ul>
+        <div class="case-study-actions">
+            <a class="button button-primary" href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">Live demo <span aria-hidden="true">↗</span></a>
+            <a class="button button-secondary" href="{{ project.source_url }}" target="_blank" rel="noopener noreferrer">GitHub / Source <span aria-hidden="true">↗</span></a>
+        </div>
+    </div>
+</header>
+
+<article class="case-study incident-case-study">
+    <div class="container flagship-layout">
+        <nav class="case-study-nav" aria-label="Case study sections">
+            <span>On this page</span>
+            <a href="#why">Why</a>
+            <a href="#screenshots">Screenshots</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#reliability">Reliability</a>
+            <a href="#observability">Observability</a>
+            <a href="#structured-ai">Structured AI</a>
+            <a href="#deployment">Deployment</a>
+            <a href="#lessons">Lessons</a>
+        </nav>
+
+        <div class="case-study-content incident-content">
+            <section id="why" class="case-study-section" aria-labelledby="why-title">
+                <p class="eyebrow">Why</p>
+                <h2 id="why-title">Long-running AI work needs a different execution model.</h2>
+                <div class="case-study-copy">{{ project.problem|linebreaks }}</div>
+            </section>
+
+            <section id="screenshots" class="case-study-section" aria-labelledby="screenshots-title">
+                <p class="eyebrow">The deployed system</p>
+                <h2 id="screenshots-title">The workflow stays visible.</h2>
+                <p class="screenshot-intro">Real captures from the public demo. Select an image to view it larger.</p>
+                <div class="screenshot-grid">
+                    {% for screenshot in screenshots %}
+                        <figure class="screenshot">
+                            <a class="screenshot-link" href="{% static screenshot.image_path %}" aria-label="View larger: {{ screenshot.caption }}">
+                                <img src="{% static screenshot.image_path %}" alt="{{ screenshot.caption }}" loading="lazy" decoding="async">
+                            </a>
+                            <figcaption>{{ screenshot.caption }}</figcaption>
+                        </figure>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="architecture" class="case-study-section" aria-labelledby="architecture-title">
+                <p class="eyebrow">Architecture</p>
+                <h2 id="architecture-title">Fan out the analysis. Join it before synthesis.</h2>
+                <div class="case-study-copy">{{ project.solution|linebreaks }}</div>
+                <ol class="incident-architecture" aria-label="Incident processing data flow">
+                    {% for step in incident.architecture %}
+                        <li><span>{{ step.label }}</span><strong>{{ step.value }}</strong></li>
+                    {% endfor %}
+                </ol>
+                <p class="architecture-caption">{{ incident.architecture_caption }}</p>
+            </section>
+
+            <section id="reliability" class="case-study-section" aria-labelledby="reliability-title">
+                <p class="eyebrow">Reliability</p>
+                <h2 id="reliability-title">Designed around partial failure and redelivery.</h2>
+                <div class="reliability-grid">
+                    {% for item in incident.reliability %}
+                        <article><span>0{{ forloop.counter }}</span><h3>{{ item.title }}</h3><p>{{ item.copy }}</p></article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="observability" class="case-study-section" aria-labelledby="observability-title">
+                <p class="eyebrow">Observability / Demo</p>
+                <h2 id="observability-title">Follow the work, not just a spinner.</h2>
+                <div class="case-study-copy">{{ project.outcome|linebreaks }}</div>
+                <ol class="incident-workflow">
+                    {% for step in incident.workflow %}<li><span>0{{ forloop.counter }}</span>{{ step }}</li>{% endfor %}
+                </ol>
+                <aside class="chaos-callout">
+                    <span>Deterministic chaos path</span>
+                    <p>{{ incident.chaos }}</p>
+                </aside>
+            </section>
+
+            <section id="structured-ai" class="case-study-section" aria-labelledby="structured-ai-title">
+                <p class="eyebrow">Structured AI</p>
+                <h2 id="structured-ai-title">A schema at the model boundary.</h2>
+                <div class="case-study-copy">
+                    {% for paragraph in incident.structured_ai %}<p>{{ paragraph }}</p>{% endfor %}
+                </div>
+                <div class="evidence-boundary" aria-label="Evidence and inference distinction">
+                    <div><span>Observed evidence</span><p>Facts preserved from the incident payload.</p></div>
+                    <div><span>AI inference</span><p>Model conclusions returned through schema-constrained output and validated by Pydantic.</p></div>
+                </div>
+            </section>
+
+            <section id="deployment" class="case-study-section" aria-labelledby="deployment-title">
+                <p class="eyebrow">Deployment</p>
+                <h2 id="deployment-title">Separate surfaces for the UI and asynchronous work.</h2>
+                <dl class="stack-list">
+                    {% for group in incident.deployment %}<div><dt>{{ group.label }}</dt><dd>{{ group.items }}</dd></div>{% endfor %}
+                </dl>
+                <h3 class="incident-stack-title">Technical stack</h3>
+                <dl class="stack-list incident-stack-list">
+                    {% for group in incident.stack %}<div><dt>{{ group.label }}</dt><dd>{{ group.items }}</dd></div>{% endfor %}
+                </dl>
+            </section>
+
+            <section id="lessons" class="case-study-section" aria-labelledby="lessons-title">
+                <p class="eyebrow">Lessons</p>
+                <h2 id="lessons-title">Durability and coordination are different jobs.</h2>
+                <div class="case-study-copy">{{ project.lessons|linebreaks }}</div>
+            </section>
+
+            <section class="incident-cta" aria-labelledby="incident-cta-title">
+                <p class="eyebrow">Explore the pipeline</p>
+                <h2 id="incident-cta-title">Run the chaos demo or inspect the implementation.</h2>
+                <div class="case-study-actions">
+                    <a class="button button-primary" href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer">Open live demo <span aria-hidden="true">↗</span></a>
+                    <a class="button button-secondary" href="{{ project.source_url }}" target="_blank" rel="noopener noreferrer">View GitHub <span aria-hidden="true">↗</span></a>
+                </div>
+            </section>
+            <a class="back-link case-study-end-link" href="/#projects"><span aria-hidden="true">←</span> Back to selected work</a>
+        </div>
+    </div>
+</article>
+
+<dialog class="screenshot-dialog" aria-label="Screenshot preview" aria-describedby="screenshot-dialog-caption">
+    <div class="screenshot-dialog-panel">
+        <form method="dialog" class="screenshot-dialog-controls">
+            <button type="submit" class="screenshot-dialog-close" aria-label="Close screenshot preview">Close <span aria-hidden="true">&times;</span></button>
+        </form>
+        <img class="screenshot-dialog-image" alt="">
+        <p id="screenshot-dialog-caption" class="screenshot-dialog-caption"></p>
+    </div>
+</dialog>
+<script src="{% static 'portfolio/screenshot-gallery.js' %}" defer></script>
+{% endblock %}
